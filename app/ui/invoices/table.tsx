@@ -36,6 +36,12 @@ export default async function InvoicesTable({
                       <p>{invoice.name}</p>
                     </div>
                     <p className="text-sm text-gray-500">{invoice.email}</p>
+                    <p className="mt-2 text-sm font-medium">
+                      {invoice.movie_title}
+                    </p>
+                    <p className="text-xs capitalize text-gray-500">
+                      {invoice.type}
+                    </p>
                   </div>
                   <InvoiceStatus status={invoice.status} />
                 </div>
@@ -62,6 +68,12 @@ export default async function InvoicesTable({
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Email
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Movie
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Type
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Amount
@@ -97,6 +109,12 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {invoice.email}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    {invoice.movie_title}
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3 capitalize">
+                    {invoice.type}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     {formatCurrency(invoice.amount)}

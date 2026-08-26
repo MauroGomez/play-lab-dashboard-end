@@ -1,0 +1,187 @@
+.root {
+  display: flow-root;
+  margin-top: 1.5rem;
+}
+
+.container {
+  display: inline-block;
+  min-width: 100%;
+  vertical-align: middle;
+}
+
+.surface {
+  border-radius: 0.5rem;
+  background-color: rgb(249 250 251);
+  padding: 0.5rem;
+}
+
+.mobileList {
+  display: block;
+}
+
+.mobileCard {
+  margin-bottom: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: rgb(255 255 255);
+  padding: 1rem;
+}
+
+.mobileHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(229 231 235);
+  padding-bottom: 1rem;
+}
+
+.title {
+  font-weight: 500;
+}
+
+.mutedText {
+  color: rgb(107 114 128);
+}
+
+.smallMutedText {
+  color: rgb(107 114 128);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.mobileDirector {
+  color: rgb(107 114 128);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.mobileDetails {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+}
+
+.mobileMetadata {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.tableActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.table {
+  display: none;
+  min-width: 100%;
+  color: rgb(17 24 39);
+}
+
+.tableHead {
+  border-radius: 0.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+}
+
+.titleHeader {
+  padding: 1.25rem 1rem;
+  font-weight: 500;
+}
+
+.header {
+  padding: 1.25rem 0.75rem;
+  font-weight: 500;
+}
+
+.actionsHeader {
+  position: relative;
+  padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.tableBody {
+  background-color: rgb(255 255 255);
+}
+
+.row {
+  width: 100%;
+  border-bottom: 1px solid rgb(229 231 235);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  vertical-align: top;
+}
+
+.row:last-of-type {
+  border-bottom: none;
+}
+
+.row:first-child > td:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+.row:first-child > td:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+.row:last-child > td:first-child {
+  border-bottom-left-radius: 0.5rem;
+}
+
+.row:last-child > td:last-child {
+  border-bottom-right-radius: 0.5rem;
+}
+
+.titleCell {
+  white-space: nowrap;
+  padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+}
+
+.cell {
+  white-space: nowrap;
+  padding: 0.75rem;
+}
+
+.actionsCell {
+  white-space: nowrap;
+  padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .titleHeader {
+    padding-left: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .surface {
+    padding-top: 0;
+  }
+
+  .mobileList {
+    display: none;
+  }
+
+  .table {
+    display: table;
+  }
+}

@@ -1,7 +1,6 @@
-import { fetchCustomers } from '@/app/lib/data';
+import { fetchCustomers, fetchMovies } from '@/app/lib/data';
 import Form from '@/app/ui/invoices/create-form';
-import FormClient from '@/app/ui/invoices/create-form-client';
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,7 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const customers = await fetchCustomers();
+  const [customers, movies] = await Promise.all([
+    fetchCustomers(),
+    fetchMovies(),
+  ]);
 
   return (
     <main>
@@ -23,8 +25,7 @@ export default async function Page() {
           },
         ]}
       />
-      {/* <Form customers={customers} /> */}
-      <FormClient customers={customers} />
+      <Form customers={customers} movies={movies} />
     </main>
   );
 }
