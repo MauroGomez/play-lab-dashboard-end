@@ -3,7 +3,7 @@ import Search from '@/app/ui/search';
 import MoviesTable from '@/app/ui/movies/table';
 import { CreateMovie } from '@/app/ui/movies/buttons';
 import { lusitana } from '@/app/ui/fonts';
-import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import { MoviesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchMoviesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
@@ -33,7 +33,7 @@ export default async function Page(props: {
         <Search placeholder="Search movies..." />
         <CreateMovie />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<MoviesTableSkeleton />}>
         <MoviesTable query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
