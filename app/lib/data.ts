@@ -5,6 +5,8 @@ import {
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
+  Movie,
+  MovieField,
   Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
@@ -68,8 +70,8 @@ export async function fetchCardData() {
       invoiceStatusPromise,
     ]);
 
-    const numberOfInvoices = Number(data[0].count ?? '0');
-    const numberOfCustomers = Number(data[1].count ?? '0');
+    const numberOfInvoices = Number(data[0][0].count ?? '0');
+    const numberOfCustomers = Number(data[1][0].count ?? '0');
     const totalPaidInvoices = formatCurrency(data[2][0].paid ?? '0');
     const totalPendingInvoices = formatCurrency(data[2][0].pending ?? '0');
 
@@ -96,17 +98,24 @@ export async function fetchFilteredInvoices(
     const invoices = await sql<InvoicesTable[]>`
       SELECT
         invoices.id,
+        invoices.customer_id,
+        invoices.movie_id,
+        invoices.type,
         invoices.amount,
         invoices.date,
         invoices.status,
         customers.name,
         customers.email,
-        customers.image_url
+        customers.image_url,
+        movies.title AS movie_title
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
+      JOIN movies ON invoices.movie_id = movies.id
       WHERE
         customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
+        movies.title ILIKE ${`%${query}%`} OR
+        invoices.type ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
         invoices.status ILIKE ${`%${query}%`}
@@ -123,16 +132,20 @@ export async function fetchFilteredInvoices(
 
 export async function fetchInvoicesPages(query: string) {
   try {
-    const data = await sql`SELECT COUNT(*)
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
-  `;
+    const data = await sql`
+      SELECT COUNT(*)
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      JOIN movies ON invoices.movie_id = movies.id
+      WHERE
+        customers.name ILIKE ${`%${query}%`} OR
+        customers.email ILIKE ${`%${query}%`} OR
+        movies.title ILIKE ${`%${query}%`} OR
+        invoices.type ILIKE ${`%${query}%`} OR
+        invoices.amount::text ILIKE ${`%${query}%`} OR
+        invoices.date::text ILIKE ${`%${query}%`} OR
+        invoices.status ILIKE ${`%${query}%`}
+    `;
 
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
@@ -148,19 +161,14 @@ export async function fetchInvoiceById(id: string) {
       SELECT
         invoices.id,
         invoices.customer_id,
-        invoices.amount,
+        invoices.movie_id,
+        invoices.type,
         invoices.status
       FROM invoices
       WHERE invoices.id = ${id};
     `;
 
-    const invoice = data.map((invoice) => ({
-      ...invoice,
-      // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
-    }));
-
-    return invoice[0];
+    return data[0];
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
@@ -187,22 +195,22 @@ export async function fetchCustomers() {
 export async function fetchFilteredCustomers(query: string) {
   try {
     const data = await sql<CustomersTableType[]>`
-		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
-		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
+      SELECT
+        customers.id,
+        customers.name,
+        customers.email,
+        customers.image_url,
+        COUNT(invoices.id) AS total_invoices,
+        COALESCE(SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END), 0) AS total_pending,
+        COALESCE(SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END), 0) AS total_paid
+      FROM customers
+      LEFT JOIN invoices ON customers.id = invoices.customer_id
+      WHERE
+        customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
-	  `;
+      GROUP BY customers.id, customers.name, customers.email, customers.image_url
+      ORDER BY customers.name ASC
+    `;
 
     const customers = data.map((customer) => ({
       ...customer,
@@ -214,5 +222,106 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchFilteredMovies(query: string, currentPage: number) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const movies = await sql<Movie[]>`
+      SELECT
+        id,
+        title,
+        director,
+        genre,
+        release_year,
+        rating,
+        duration_minutes,
+        purchase_price,
+        rental_price,
+        status
+      FROM movies
+      WHERE
+        title ILIKE ${`%${query}%`} OR
+        director ILIKE ${`%${query}%`} OR
+        genre ILIKE ${`%${query}%`} OR
+        release_year::text ILIKE ${`%${query}%`} OR
+        rating ILIKE ${`%${query}%`} OR
+        status ILIKE ${`%${query}%`}
+      ORDER BY title ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return movies;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch movies.');
+  }
+}
+
+export async function fetchMovies() {
+  try {
+    const movies = await sql<MovieField[]>`
+      SELECT
+        id,
+        title,
+        purchase_price,
+        rental_price
+      FROM movies
+      ORDER BY title ASC
+    `;
+
+    return movies;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch all movies.');
+  }
+}
+
+export async function fetchMoviesPages(query: string) {
+  try {
+    const data = await sql`
+      SELECT COUNT(*)
+      FROM movies
+      WHERE
+        title ILIKE ${`%${query}%`} OR
+        director ILIKE ${`%${query}%`} OR
+        genre ILIKE ${`%${query}%`} OR
+        release_year::text ILIKE ${`%${query}%`} OR
+        rating ILIKE ${`%${query}%`} OR
+        status ILIKE ${`%${query}%`}
+    `;
+
+    const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of movies.');
+  }
+}
+
+export async function fetchMovieById(id: string) {
+  try {
+    const data = await sql<Movie[]>`
+      SELECT
+        id,
+        title,
+        director,
+        genre,
+        release_year,
+        rating,
+        duration_minutes,
+        purchase_price,
+        rental_price,
+        status
+      FROM movies
+      WHERE id = ${id};
+    `;
+
+    return data[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch movie.');
   }
 }
