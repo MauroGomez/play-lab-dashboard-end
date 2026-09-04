@@ -1,7 +1,9 @@
 'use client';
 
-import { MovieForm } from '@/app/lib/definitions';
-import { createMovie, MovieState, updateMovie } from '@/app/lib/actions';
+import {
+  type MovieFormErrors,
+  validateMovie,
+} from '@/app/live-coding/3-4/model/validation';
 import { Button } from '@/app/ui/button';
 import {
   BanknotesIcon,
@@ -11,25 +13,59 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { FormEvent, ReactNode } from 'react';
+import { useState } from 'react';
 import styles from './form.module.css';
 
-export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
-  const initialState: MovieState = { message: null, errors: {} };
-  const action = movie ? updateMovie.bind(null, movie.id) : createMovie;
-  const [state, formAction] = useActionState(action, initialState);
-  const isEditing = Boolean(movie);
+export default function CreateMovieForm() {
+  const router = useRouter();
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const rawMovieData = Object.fromEntries(formData.entries());
+    const validationResult = validateMovie(rawMovieData);
+
+    if (!validationResult.success) {
+      setFieldErrors(validationResult.fieldErrors);
+      setErrorMessage(validationResult.message);
+      return;
+    }
+
+    setFieldErrors({});
+    setErrorMessage(null);
+
+    const response = await fetch('/live-coding/3-2/api/movies', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(validationResult.data),
+    });
+
+    if (!response.ok) {
+      setErrorMessage('Failed to save movie.');
+      return;
+    }
+
+    router.push('/dashboard/movies');
+    router.refresh();
+
+  }
 
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <div className={styles.container}>
         <TextField
           id="title"
           label="Title"
           name="title"
           placeholder="Enter movie title"
-          defaultValue={movie?.title}
-          errors={state.errors?.title}
+          errors={fieldErrors.title}
           icon={<FilmIcon className={styles.icon} />}
         />
 
@@ -38,8 +74,7 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
           label="Director"
           name="director"
           placeholder="Enter director"
-          defaultValue={movie?.director}
-          errors={state.errors?.director}
+          errors={fieldErrors.director}
           icon={<UserIcon className={styles.icon} />}
         />
 
@@ -49,8 +84,7 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
             label="Genre"
             name="genre"
             placeholder="Drama, action, comedy..."
-            defaultValue={movie?.genre}
-            errors={state.errors?.genre}
+            errors={fieldErrors.genre}
             icon={<TagIcon className={styles.icon} />}
           />
 
@@ -59,8 +93,7 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
             label="Rating"
             name="rating"
             placeholder="PG-13"
-            defaultValue={movie?.rating}
-            errors={state.errors?.rating}
+            errors={fieldErrors.rating}
             icon={<TagIcon className={styles.icon} />}
           />
         </div>
@@ -69,36 +102,31 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
           <TextField
             id="release-year"
             label="Release year"
-            name="releaseYear"
+            name="release_year"
             type="number"
             placeholder="2024"
-            defaultValue={movie?.release_year}
-            errors={state.errors?.releaseYear}
+            errors={fieldErrors.release_year}
             icon={<ClockIcon className={styles.icon} />}
           />
 
           <TextField
             id="duration-minutes"
             label="Duration"
-            name="durationMinutes"
+            name="duration_minutes"
             type="number"
             placeholder="120"
-            defaultValue={movie?.duration_minutes}
-            errors={state.errors?.durationMinutes}
+            errors={fieldErrors.duration_minutes}
             icon={<ClockIcon className={styles.icon} />}
           />
 
           <TextField
             id="purchase-price"
             label="Purchase price"
-            name="purchasePrice"
+            name="purchase_price"
             type="number"
             step="0.01"
             placeholder="12.99"
-            defaultValue={
-              movie ? (movie.purchase_price / 100).toFixed(2) : undefined
-            }
-            errors={state.errors?.purchasePrice}
+            errors={fieldErrors.purchase_price}
             icon={<BanknotesIcon className={styles.icon} />}
           />
         </div>
@@ -107,14 +135,11 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
           <TextField
             id="rental-price"
             label="Rental price"
-            name="rentalPrice"
+            name="rental_price"
             type="number"
             step="0.01"
             placeholder="4.99"
-            defaultValue={
-              movie ? (movie.rental_price / 100).toFixed(2) : undefined
-            }
-            errors={state.errors?.rentalPrice}
+            errors={fieldErrors.rental_price}
             icon={<BanknotesIcon className={styles.icon} />}
           />
 
@@ -126,8 +151,8 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
               id="status"
               name="status"
               className={styles.select}
-              defaultValue={movie?.status ?? ''}
               aria-describedby="status-error"
+              defaultValue=""
             >
               <option value="" disabled>
                 Select status
@@ -136,13 +161,13 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
-            <FieldErrors id="status-error" errors={state.errors?.status} />
+            <FieldErrors id="status-error" errors={fieldErrors.status} />
           </div>
         </div>
 
         <div aria-live="polite" aria-atomic="true">
-          {state.message ? (
-            <p className={styles.error}>{state.message}</p>
+          {errorMessage ? (
+            <p className={styles.error}>{errorMessage}</p>
           ) : null}
         </div>
       </div>
@@ -153,7 +178,7 @@ export default function MovieEditorForm({ movie }: { movie?: MovieForm }) {
         >
           Cancel
         </Link>
-        <Button type="submit">{isEditing ? 'Edit Movie' : 'Create Movie'}</Button>
+        <Button type="submit">{'Create Movie'}</Button>
       </div>
     </form>
   );
@@ -176,7 +201,7 @@ function TextField({
   placeholder: string;
   defaultValue?: string | number;
   errors?: string[];
-  icon: React.ReactNode;
+  icon: ReactNode;
   type?: string;
   step?: string;
 }) {
