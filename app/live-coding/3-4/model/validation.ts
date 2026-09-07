@@ -1,25 +1,26 @@
 import { z } from 'zod';
 
-const PriceField = z.coerce
-  .number()
-  .gt(0, { message: 'Please enter a price greater than $0.' })
-  .transform((price) => Math.round(price * 100));
-
 export const MovieFormSchema = z.object({
   title: z.string().nonempty({ message: 'Please enter a title.' }),
   director: z.string().nonempty({ message: 'Please enter a director.' }),
   genre: z.string().nonempty({ message: 'Please enter a genre.' }),
-  release_year: z.coerce
+  release_year: z
     .number()
     .int()
     .min(1888, { message: 'Please enter a valid release year.' }),
   rating: z.string().nonempty({ message: 'Please enter a rating.' }),
-  duration_minutes: z.coerce
+  duration_minutes: z
     .number()
     .int()
     .gt(0, { message: 'Please enter a duration greater than 0.' }),
-  purchase_price: PriceField,
-  rental_price: PriceField,
+  purchase_price: z
+    .number()
+    .int()
+    .gt(0, { message: 'Please enter a purchase price greater than $0.' }),
+  rental_price: z
+    .number()
+    .int()
+    .gt(0, { message: 'Please enter a rental price greater than $0.' }),
   status: z.enum(['available', 'draft', 'archived'], {
     invalid_type_error: 'Please select a movie status.',
   }),
@@ -51,7 +52,7 @@ export function validateMovie(input: unknown): ValidateMovieResult {
       success: false,
       data: null,
       fieldErrors: result.error.flatten().fieldErrors,
-      message: 'Please fix the errors below.',
+      message: 'Please fix the field errors.',
     };
   }
 

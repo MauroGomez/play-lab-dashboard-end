@@ -27,8 +27,18 @@ export default function CreateMovieForm() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const rawMovieData = Object.fromEntries(formData.entries());
-    const validationResult = validateMovie(rawMovieData);
+    const movieData = {
+      title: String(formData.get('title') ?? ''),
+      director: String(formData.get('director') ?? ''),
+      genre: String(formData.get('genre') ?? ''),
+      release_year: Number(formData.get('release_year')),
+      rating: String(formData.get('rating') ?? ''),
+      duration_minutes: Number(formData.get('duration_minutes')),
+      purchase_price: Math.round(Number(formData.get('purchase_price')) * 100),
+      rental_price: Math.round(Number(formData.get('rental_price')) * 100),
+      status: String(formData.get('status') ?? ''),
+    };
+    const validationResult = validateMovie(movieData);
 
     if (!validationResult.success) {
       setFieldErrors(validationResult.fieldErrors);
@@ -44,11 +54,14 @@ export default function CreateMovieForm() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(rawMovieData),
+      body: JSON.stringify(movieData),
     });
 
     if (!response.ok) {
-      setErrorMessage('Failed to save movie.');
+      const errorResponse = (await response.json());
+
+      setFieldErrors(errorResponse.errors ?? {});
+      setErrorMessage(errorResponse.message ?? 'Failed to save movie.');
       return;
     }
 

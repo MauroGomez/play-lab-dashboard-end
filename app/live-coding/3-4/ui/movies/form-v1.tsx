@@ -30,7 +30,7 @@ export default function CreateMovieForm() {
       duration_minutes: Number(formData.get('duration_minutes')),
       purchase_price: Math.round(Number(formData.get('purchase_price')) * 100),
       rental_price: Math.round(Number(formData.get('rental_price')) * 100),
-      status: String(formData.get('status') ?? '') as MovieStatus,
+      status: String(formData.get('status') ?? '')
     };
 
     await fetch('/live-coding/3-2/api/movies', {
