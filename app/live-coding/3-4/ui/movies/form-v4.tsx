@@ -18,7 +18,7 @@ import { useState } from 'react';
 import styles from './form.module.css';
 import { createMovieAction } from '../../actions';
 
-export default function CreateMovieForm() {  
+export default function CreateMovieForm() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
@@ -50,7 +50,7 @@ export default function CreateMovieForm() {
 
     const result = await createMovieAction(movieData);
 
-    if (!result.success) {      
+    if (!result.success) {
       setFieldErrors(result.errors ?? {});
       setErrorMessage(result.message ?? 'Failed to save movie.');
       return;
