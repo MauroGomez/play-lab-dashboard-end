@@ -6,7 +6,6 @@ import { lusitana } from '@/app/ui/fonts';
 import { fetchFilteredMovies, fetchMoviesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { MoviesTableSkeleton } from '@/app/ui/skeletons';
 
 export const metadata: Metadata = {
   title: 'Movies',
@@ -33,7 +32,7 @@ export default async function Page(props: {
         <Search placeholder="Search movies..." />
         <CreateMovie />
       </div>
-      <Suspense key={query + currentPage} fallback={<MoviesTableSkeleton/>}>
+      <Suspense key={query + currentPage} fallback={<div>Loading...</div>}>
         <MoviesTableWrapper query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
@@ -50,4 +49,3 @@ async function MoviesTableWrapper({ query, currentPage }: { query: string; curre
     <MoviesTable movies={movies} />
   );
 }
-

@@ -1,0 +1,32 @@
+.button {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #f3f4f6;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.icon {
+  width: 20px;
+}
+
+.spinner {
+  width: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

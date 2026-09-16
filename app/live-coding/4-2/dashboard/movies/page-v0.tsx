@@ -5,8 +5,6 @@ import { CreateMovie } from '@/app/ui/movies/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchFilteredMovies, fetchMoviesPages } from '@/app/lib/data';
 import { Metadata } from 'next';
-import { Suspense } from 'react';
-import { MoviesTableSkeleton } from '@/app/ui/skeletons';
 
 export const metadata: Metadata = {
   title: 'Movies',
@@ -23,6 +21,7 @@ export default async function Page(props: {
   const currentPage = Number(searchParams?.page) || 1;
 
   const totalPages = await fetchMoviesPages(query);
+  const movies = await fetchFilteredMovies(query, currentPage);
 
   return (
     <div className="w-full">
@@ -33,21 +32,10 @@ export default async function Page(props: {
         <Search placeholder="Search movies..." />
         <CreateMovie />
       </div>
-      <Suspense key={query + currentPage} fallback={<MoviesTableSkeleton/>}>
-        <MoviesTableWrapper query={query} currentPage={currentPage} />
-      </Suspense>
+      <MoviesTable movies={movies} />
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>
     </div>
   );
 }
-
-async function MoviesTableWrapper({ query, currentPage }: { query: string; currentPage: number }) {
-  const movies = await fetchFilteredMovies(query, currentPage);
-
-  return (
-    <MoviesTable movies={movies} />
-  );
-}
-

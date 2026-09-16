@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import { unstable_cache } from 'next/cache';
 import {
   CustomerField,
   CustomersTableType,
@@ -226,6 +227,8 @@ export async function fetchFilteredCustomers(query: string) {
 }
 
 export async function fetchFilteredMovies(query: string, currentPage: number) {
+  console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
+  await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -252,7 +255,7 @@ export async function fetchFilteredMovies(query: string, currentPage: number) {
       ORDER BY title ASC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
-
+    console.log('Fetched filtered movies:', movies.length, new Date().toISOString());
     return movies;
   } catch (error) {
     console.error('Database Error:', error);
@@ -279,7 +282,7 @@ export async function fetchMovies() {
   }
 }
 
-export async function fetchMoviesPages(query: string) {
+async function fetchMoviesPagesUncached(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
@@ -292,7 +295,6 @@ export async function fetchMoviesPages(query: string) {
         rating ILIKE ${`%${query}%`} OR
         status ILIKE ${`%${query}%`}
     `;
-
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
@@ -300,6 +302,12 @@ export async function fetchMoviesPages(query: string) {
     throw new Error('Failed to fetch total number of movies.');
   }
 }
+
+export const fetchMoviesPages = unstable_cache(
+  fetchMoviesPagesUncached,
+  ['movies-pages'],
+  { revalidate: 300 },
+);
 
 export async function fetchMovieById(id: string) {
   try {
