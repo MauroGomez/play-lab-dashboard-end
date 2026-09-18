@@ -16,18 +16,18 @@ const MovieFormSchema = z.object({
   purchase_price: z
     .number()
     .int()
-    .gt(0, { message: 'Please enter a purchase price greater than $0.' }),
+    .gt(0, { message: 'Please enter a purchase price greater than 0.' }),
   rental_price: z
     .number()
     .int()
-    .gt(0, { message: 'Please enter a rental price greater than $0.' }),
+    .gt(0, { message: 'Please enter a rental price greater than 0.' }),
   status: z.enum(['available', 'draft', 'archived'], {
-    invalid_type_error: 'Please select a movie status.',
+    invalid_type_error: 'Please select a movie status.',  // contemplates null, and other types    
   }),
 });
 
-export type MovieFormInput = z.input<typeof MovieFormSchema>;
-export type MovieFormData = z.output<typeof MovieFormSchema>;
+type MovieFormInput = z.input<typeof MovieFormSchema>;
+type MovieFormData = z.output<typeof MovieFormSchema>;
 export type MovieFormErrors = Partial<Record<keyof MovieFormInput, string[]>>;
 
 type ValidateMovieResult =
