@@ -1,6 +1,6 @@
 import { getMovieData } from '@/model/data';
 import Breadcrumbs from '@/ui/breadcrumbs';
-import Form from '@/ui/movies/create-form';
+import Form from '@/ui/movies/edit-form';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
