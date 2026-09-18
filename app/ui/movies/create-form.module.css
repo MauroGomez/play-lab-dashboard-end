@@ -1,7 +1,42 @@
 .container {
+  position: relative;
+  min-width: 0;
   border-radius: 6px;
   background: #f9fafb;
   padding: 16px;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: rgb(255 255 255 / 65%);
+  cursor: wait;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #dbeafe;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
 }
 
 .gridTwoColumns,
@@ -74,7 +109,7 @@
   margin-top: 24px;
 }
 
-.cancelLink {
+.cancelButton {
   display: flex;
   align-items: center;
   height: 40px;
@@ -85,12 +120,16 @@
   color: #4b5563;
   font-size: 14px;
   font-weight: 500;
-  text-decoration: none;
   transition: background-color 150ms ease;
 }
 
-.cancelLink:hover {
+.cancelButton:hover:not(:disabled) {
   background: #e5e7eb;
+}
+
+.cancelButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 @media (min-width: 768px) {

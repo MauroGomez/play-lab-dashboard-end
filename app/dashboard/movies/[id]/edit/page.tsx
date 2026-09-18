@@ -1,6 +1,6 @@
 import { fetchMovieById } from '@/app/lib/data';
 import Breadcrumbs from '@/app/ui/breadcrumbs';
-import Form from '@/app/ui/movies/form';
+import Form from '@/app/ui/movies/create-form';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

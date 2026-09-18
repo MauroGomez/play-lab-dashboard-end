@@ -227,8 +227,8 @@ export async function fetchFilteredCustomers(query: string) {
 }
 
 export async function fetchFilteredMovies(query: string, currentPage: number) {
-  console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
-  await new Promise((resolve) => setTimeout(resolve, 3000)); // Simulate a 2-second delay
+  // console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
+  // await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -255,7 +255,7 @@ export async function fetchFilteredMovies(query: string, currentPage: number) {
       ORDER BY title ASC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
-    console.log('Fetched filtered movies:', movies.length, new Date().toISOString());
+    // console.log('Fetched filtered movies:', movies.length, new Date().toISOString());
     return movies;
   } catch (error) {
     console.error('Database Error:', error);
@@ -309,6 +309,8 @@ export const fetchMoviesPages = unstable_cache(
   { revalidate: 300 },
 );
 
+// export const fetchMoviesPages = fetchMoviesPagesUncached;
+
 export async function fetchMovieById(id: string) {
   try {
     const data = await sql<Movie[]>`
@@ -332,4 +334,136 @@ export async function fetchMovieById(id: string) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch movie.');
   }
+}
+
+export async function getMovies() {
+  const movies = await sql<Movie[]>`
+    SELECT
+      id,
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+    FROM movies
+    ORDER BY title ASC
+  `;
+
+  return movies;
+}
+
+export async function getMovie(id: string) {
+  const movies = await sql<Movie[]>`
+    SELECT
+      id,
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+    FROM movies
+    WHERE id = ${id}
+  `;
+
+  return movies[0];
+}
+
+export type MovieInput = {
+  title: string;
+  director: string;
+  genre: string;
+  release_year: number;
+  rating: string;
+  duration_minutes: number;
+  purchase_price: number;
+  rental_price: number;
+  status: 'available' | 'draft' | 'archived';
+};
+
+export async function createMovie(movie: MovieInput) {
+  const movies = await sql<Movie[]>`
+    INSERT INTO movies (
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+    )
+    VALUES (
+      ${movie.title},
+      ${movie.director},
+      ${movie.genre},
+      ${movie.release_year},
+      ${movie.rating},
+      ${movie.duration_minutes},
+      ${movie.purchase_price},
+      ${movie.rental_price},
+      ${movie.status}
+    )
+    RETURNING
+      id,
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+  `;
+
+  return movies[0];
+}
+
+export async function updateMovie(id: string, movie: MovieInput) {
+  const movies = await sql<Movie[]>`
+    UPDATE movies
+    SET
+      title = ${movie.title},
+      director = ${movie.director},
+      genre = ${movie.genre},
+      release_year = ${movie.release_year},
+      rating = ${movie.rating},
+      duration_minutes = ${movie.duration_minutes},
+      purchase_price = ${movie.purchase_price},
+      rental_price = ${movie.rental_price},
+      status = ${movie.status}
+    WHERE id = ${id}
+    RETURNING
+      id,
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+  `;
+
+  return movies[0];
+}
+
+export async function deleteMovie(id: string) {
+  const movies = await sql<{ id: string }[]>`
+    DELETE FROM movies
+    WHERE id = ${id}
+    RETURNING id
+  `;
+
+  return Boolean(movies[0]);
 }

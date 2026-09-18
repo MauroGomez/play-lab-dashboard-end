@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { MovieFormErrors, validateMovie } from '@/app/lib/validation';
+import { createMovie } from './data';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -188,69 +190,32 @@ export async function deleteInvoice(id: string) {
   revalidatePath('/dashboard/invoices');
 }
 
-export async function createMovie(prevState: MovieState, formData: FormData) {
-  const validatedFields = CreateMovie.safeParse({
-    title: formData.get('title'),
-    director: formData.get('director'),
-    genre: formData.get('genre'),
-    releaseYear: formData.get('releaseYear'),
-    rating: formData.get('rating'),
-    durationMinutes: formData.get('durationMinutes'),
-    purchasePrice: formData.get('purchasePrice'),
-    rentalPrice: formData.get('rentalPrice'),
-    status: formData.get('status'),
-  });
+type CreateMovieState = {
+  success: boolean;
+  errors: MovieFormErrors;
+  message: string | null;
+};
 
-  if (!validatedFields.success) {
+export async function createMovieAction(
+  movieData: unknown,
+): Promise<CreateMovieState> {
+  const validationResult = validateMovie(movieData);
+
+  if (!validationResult.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Movie.',
+      success: false,
+      errors: validationResult.fieldErrors,
+      message: validationResult.message,
     };
   }
 
-  const {
-    title,
-    director,
-    genre,
-    releaseYear,
-    rating,
-    durationMinutes,
-    purchasePrice,
-    rentalPrice,
-    status,
-  } = validatedFields.data;
-
-  const purchasePriceInCents = purchasePrice * 100;
-  const rentalPriceInCents = rentalPrice * 100;
-
   try {
-    await sql`
-      INSERT INTO movies (
-        title,
-        director,
-        genre,
-        release_year,
-        rating,
-        duration_minutes,
-        purchase_price,
-        rental_price,
-        status
-      )
-      VALUES (
-        ${title},
-        ${director},
-        ${genre},
-        ${releaseYear},
-        ${rating},
-        ${durationMinutes},
-        ${purchasePriceInCents},
-        ${rentalPriceInCents},
-        ${status}
-      )
-    `;
+    await createMovie(validationResult.data);
   } catch (error) {
     return {
-      message: 'Database Error: Failed to Create Movie.',
+      success: false,
+      errors: {},
+      message: 'Failed to create movie.',
     };
   }
 
