@@ -3,7 +3,7 @@ import Search from '@/ui/search';
 import MoviesTable from '@/ui/movies/table';
 import { CreateMovie } from '@/ui/movies/buttons';
 import { lusitana } from '@/ui/fonts';
-import { fetchFilteredMovies, fetchMoviesPages } from '@/model/data';
+import { getFilteredMoviesData, getMoviesPagesData } from '@/model/data';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { MoviesTableSkeleton } from '@/ui/skeletons';
@@ -22,7 +22,7 @@ export default async function Page(props: {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchMoviesPages(query);
+  const totalPages = await getMoviesPagesData(query);
 
   return (
     <div className="w-full">
@@ -44,7 +44,7 @@ export default async function Page(props: {
 }
 
 async function MoviesTableWrapper({ query, currentPage }: { query: string; currentPage: number }) {
-  const movies = await fetchFilteredMovies(query, currentPage);
+  const movies = await getFilteredMoviesData(query, currentPage);
 
   return (
     <MoviesTable movies={movies} />

@@ -1,4 +1,4 @@
-import { fetchMovieById } from '@/model/data';
+import { getMovieData } from '@/model/data';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import Form from '@/ui/movies/create-form';
 import { Metadata } from 'next';
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
-  const movie = await fetchMovieById(params.id);
+  const movie = await getMovieData(params.id);
 
   if (!movie) {
     notFound();

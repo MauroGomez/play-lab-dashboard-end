@@ -1,4 +1,4 @@
-import { fetchCustomers, fetchMovies } from '@/model/data';
+import { getCustomerSummariesData, getMovieSummariesData } from '@/model/data';
 import Form from '@/ui/invoices/create-form';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import { Metadata } from 'next';
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const [customers, movies] = await Promise.all([
-    fetchCustomers(),
-    fetchMovies(),
+    getCustomerSummariesData(),
+    getMovieSummariesData(),
   ]);
 
   return (

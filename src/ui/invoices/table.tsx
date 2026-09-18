@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/buttons';
 import InvoiceStatus from '@/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
-import { fetchFilteredInvoices } from '@/model/data';
+import { getFilteredInvoicesData } from '@/model/data';
 
 export default async function InvoicesTable({
   query,
@@ -11,7 +11,7 @@ export default async function InvoicesTable({
   query: string;
   currentPage: number;
 }) {
-  const invoices = await fetchFilteredInvoices(query, currentPage);
+  const invoices = await getFilteredInvoicesData(query, currentPage);
 
   return (
     <div className="mt-6 flow-root">

@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import styles from './form.module.css';
-import { createMovieAction } from '@/lib/actions';
+import { createMovie } from '@/lib/actions';
 
 export default function CreateMovieForm() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function CreateMovieForm() {
 
     setIsCreating(true);
     try {
-      const result = await createMovieAction(movieData);
+      const result = await createMovie(movieData);
 
       if (!result.success) {
         setFieldErrors(result.errors ?? {});

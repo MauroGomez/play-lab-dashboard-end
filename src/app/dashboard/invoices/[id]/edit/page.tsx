@@ -1,4 +1,4 @@
-import { fetchInvoiceById, fetchCustomers, fetchMovies } from '@/model/data';
+import { getInvoiceData, getCustomerSummariesData, getMovieSummariesData } from '@/model/data';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import Form from '@/ui/invoices/edit-form';
 import { Metadata } from 'next';
@@ -12,9 +12,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
   const [invoice, customers, movies] = await Promise.all([
-    fetchInvoiceById(id),
-    fetchCustomers(),
-    fetchMovies(),
+    getInvoiceData(id),
+    getCustomerSummariesData(),
+    getMovieSummariesData(),
   ]);
 
   if (!invoice) {

@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { MovieFormErrors, validateMovie } from '@/model/validation';
-import { createMovie } from '@/model/data';
+import { createMovieData, deleteMovieData } from '@/model/data';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -196,7 +196,7 @@ type CreateMovieState = {
   message: string | null;
 };
 
-export async function createMovieAction(
+export async function createMovie(
   movieData: unknown,
 ): Promise<CreateMovieState> {
   const validationResult = validateMovie(movieData);
@@ -210,7 +210,7 @@ export async function createMovieAction(
   }
 
   try {
-    await createMovie(validationResult.data);
+    await createMovieData(validationResult.data);
   } catch (error) {
     return {
       success: false,
@@ -286,7 +286,7 @@ export async function updateMovie(
 }
 
 export async function deleteMovie(id: string) {
-  await sql`DELETE FROM movies WHERE id = ${id}`;
+  await deleteMovieData(id);
   revalidatePath('/dashboard/movies');
 }
 

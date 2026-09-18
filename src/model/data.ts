@@ -14,7 +14,7 @@ import { formatCurrency } from '@/lib/utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function fetchRevenue() {
+export async function getRevenueData() {
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
@@ -33,7 +33,7 @@ export async function fetchRevenue() {
   }
 }
 
-export async function fetchLatestInvoices() {
+export async function getLatestInvoicesData() {
   try {
     const data = await sql<LatestInvoiceRaw[]>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -53,7 +53,7 @@ export async function fetchLatestInvoices() {
   }
 }
 
-export async function fetchCardData() {
+export async function getCardDataData() {
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
@@ -89,7 +89,7 @@ export async function fetchCardData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function fetchFilteredInvoices(
+export async function getFilteredInvoicesData(
   query: string,
   currentPage: number,
 ) {
@@ -131,7 +131,7 @@ export async function fetchFilteredInvoices(
   }
 }
 
-export async function fetchInvoicesPages(query: string) {
+export async function getInvoicesPagesData(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
@@ -156,7 +156,7 @@ export async function fetchInvoicesPages(query: string) {
   }
 }
 
-export async function fetchInvoiceById(id: string) {
+export async function getInvoiceData(id: string) {
   try {
     const data = await sql<InvoiceForm[]>`
       SELECT
@@ -176,7 +176,7 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
-export async function fetchCustomers() {
+export async function getCustomerSummariesData() {
   try {
     const customers = await sql<CustomerField[]>`
       SELECT
@@ -193,7 +193,7 @@ export async function fetchCustomers() {
   }
 }
 
-export async function fetchFilteredCustomers(query: string) {
+export async function getFilteredCustomersData(query: string) {
   try {
     const data = await sql<CustomersTableType[]>`
       SELECT
@@ -226,9 +226,9 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
-export async function fetchFilteredMovies(query: string, currentPage: number) {
+export async function getFilteredMoviesData(query: string, currentPage: number) {
   // console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
-  // await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
+  await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -263,7 +263,7 @@ export async function fetchFilteredMovies(query: string, currentPage: number) {
   }
 }
 
-export async function fetchMovies() {
+export async function getMovieSummariesData() {
   try {
     const movies = await sql<MovieField[]>`
       SELECT
@@ -282,7 +282,7 @@ export async function fetchMovies() {
   }
 }
 
-async function fetchMoviesPagesUncached(query: string) {
+async function getMoviesPagesDataUncached(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
@@ -303,15 +303,35 @@ async function fetchMoviesPagesUncached(query: string) {
   }
 }
 
-export const fetchMoviesPages = unstable_cache(
-  fetchMoviesPagesUncached,
+export const getMoviesPagesData = unstable_cache(
+  getMoviesPagesDataUncached,
   ['movies-pages'],
   { revalidate: 300 },
 );
 
-// export const fetchMoviesPages = fetchMoviesPagesUncached;
+// export const getMoviesPagesData = getMoviesPagesDataUncached;
 
-export async function fetchMovieById(id: string) {
+export async function getMoviesData() {
+  const movies = await sql<Movie[]>`
+    SELECT
+      id,
+      title,
+      director,
+      genre,
+      release_year,
+      rating,
+      duration_minutes,
+      purchase_price,
+      rental_price,
+      status
+    FROM movies
+    ORDER BY title ASC
+  `;
+
+  return movies;
+}
+
+export async function getMovieData(id: string) {
   try {
     const data = await sql<Movie[]>`
       SELECT
@@ -336,46 +356,6 @@ export async function fetchMovieById(id: string) {
   }
 }
 
-export async function getMovies() {
-  const movies = await sql<Movie[]>`
-    SELECT
-      id,
-      title,
-      director,
-      genre,
-      release_year,
-      rating,
-      duration_minutes,
-      purchase_price,
-      rental_price,
-      status
-    FROM movies
-    ORDER BY title ASC
-  `;
-
-  return movies;
-}
-
-export async function getMovie(id: string) {
-  const movies = await sql<Movie[]>`
-    SELECT
-      id,
-      title,
-      director,
-      genre,
-      release_year,
-      rating,
-      duration_minutes,
-      purchase_price,
-      rental_price,
-      status
-    FROM movies
-    WHERE id = ${id}
-  `;
-
-  return movies[0];
-}
-
 export type MovieInput = {
   title: string;
   director: string;
@@ -388,7 +368,7 @@ export type MovieInput = {
   status: 'available' | 'draft' | 'archived';
 };
 
-export async function createMovie(movie: MovieInput) {
+export async function createMovieData(movie: MovieInput) {
   const movies = await sql<Movie[]>`
     INSERT INTO movies (
       title,
@@ -428,7 +408,7 @@ export async function createMovie(movie: MovieInput) {
   return movies[0];
 }
 
-export async function updateMovie(id: string, movie: MovieInput) {
+export async function updateMovieData(id: string, movie: MovieInput) {
   const movies = await sql<Movie[]>`
     UPDATE movies
     SET
@@ -458,7 +438,7 @@ export async function updateMovie(id: string, movie: MovieInput) {
   return movies[0];
 }
 
-export async function deleteMovie(id: string) {
+export async function deleteMovieData(id: string) {
   const movies = await sql<{ id: string }[]>`
     DELETE FROM movies
     WHERE id = ${id}

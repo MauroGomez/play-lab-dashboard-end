@@ -1,5 +1,5 @@
 'use client';
-import { createMovieAction } from '@/lib/actions';
+import { createMovie } from '@/lib/actions';
 import { validateMovie, MovieFormErrors } from '@/model/validation'
 import { Button } from '@/ui/button';
 import {
@@ -50,7 +50,7 @@ export default function CreateMovieForm() {
 
     setIsCreating(true);
     try {
-      const result = await createMovieAction(movieData);
+      const result = await createMovie(movieData);
 
       if (!result.success) {
         setFieldErrors(result.errors ?? {});
