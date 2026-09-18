@@ -1,0 +1,23 @@
+import '@/ui/global.css';
+import { inter } from '@/ui/fonts';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | PlayLab Dashboard',
+    default: 'PlayLab Dashboard',
+  },
+  description: 'An example application for the LTW course, adapted from the official Next.js Learn Dashboard.',
+  metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+};
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} antialiased`}>{children}</body>
+    </html>
+  );
+}
