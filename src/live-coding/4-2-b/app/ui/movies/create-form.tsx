@@ -3,7 +3,7 @@
 import {
   type MovieFormErrors,
   validateMovie,
-} from '@/live-coding/3-4/model/validation';
+} from '@/model/validation';
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,

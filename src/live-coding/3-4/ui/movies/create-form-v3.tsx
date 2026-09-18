@@ -1,7 +1,5 @@
 'use client';
-
-import { createMovie } from '@/lib/actions';
-import { validateMovie, type MovieFormErrors } from '@/model/validation';
+import { validateMovie, MovieFormErrors } from '@/model/validation'
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
@@ -10,6 +8,7 @@ import {
   TagIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
@@ -20,12 +19,9 @@ export default function CreateMovieForm() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
-  const [isCreating, setIsCreating] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (isCreating) return;
-
     const formData = new FormData(e.currentTarget);
     const movieData = {
       title: formData.get('title'),
@@ -49,23 +45,30 @@ export default function CreateMovieForm() {
     setFieldErrors({});
     setErrorMessage(null);
 
-    setIsCreating(true);
-    try {
-      const result = await createMovie(movieData);
+    const response = await fetch('/api/movies', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(movieData),
+    });
 
-      if (!result.success) {
-        setFieldErrors(result.errors ?? {});
-        setErrorMessage(result.message ?? 'Failed to save movie.');
-      }
-    } finally {
-      setIsCreating(false);
+    if (!response.ok) {
+      const errorResponse = (await response.json());
+
+      setFieldErrors(errorResponse.errors ?? {});
+      setErrorMessage(errorResponse.message ?? 'Failed to save movie.');
+      return;
     }
+
+    router.push('/dashboard/movies');
+    router.refresh();
 
   }
 
   return (
-    <form onSubmit={handleSubmit} aria-busy={isCreating}>
-      <fieldset className={styles.container} disabled={isCreating}>
+    <form onSubmit={handleSubmit}>
+      <fieldset className={styles.container}>
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
             Title
@@ -244,25 +247,15 @@ export default function CreateMovieForm() {
             <p className={styles.error}>{errorMessage}</p>
           ) : null}
         </div>
-        {isCreating && (
-          <div className={styles.loadingOverlay} role="status">
-            <span className={styles.spinner} aria-hidden="true" />
-            <span className="sr-only">Creating movie...</span>
-          </div>
-        )}
       </fieldset>
       <div className={styles.actions}>
-        <button
-          type="button"
-          className={styles.cancelButton}
-          disabled={isCreating}
-          onClick={() => router.push('/dashboard/movies')}
+        <Link
+          href="/dashboard/movies"
+          className={styles.cancelLink}
         >
           Cancel
-        </button>
-        <Button type="submit" disabled={isCreating} aria-disabled={isCreating}>
-          Create Movie
-        </Button>
+        </Link>
+        <Button type="submit">{'Create Movie'}</Button>
       </div>
     </form>
   );

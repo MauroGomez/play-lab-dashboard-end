@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createMovie } from '../../../3-2/data';
-import { validateMovie } from '../../model/validation';
+import { createMovieData } from '@/model/data';
+import { validateMovie } from '@/model/validation';
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const movie = await createMovie(validationResult.data);
+    const movie = await createMovieData(validationResult.data);
 
     return NextResponse.json(movie, { status: 201 });
   } catch (error) {

@@ -1,6 +1,6 @@
 import { formatCurrency } from '@/lib/utils';
 import { DeleteMovie, UpdateMovie } from '@/ui/movies/buttons';
-import { DeleteMovieConfirmButton } from '@/ui/movies/delete-button';
+import DeleteMovieButton from '@/ui/movies/delete-button';
 import MovieStatus from '@/ui/movies/status';
 import styles from './table.module.css';
 import { Movie } from '@/model/definitions';
@@ -94,7 +94,7 @@ export default async function MoviesTable({
                   <td className={styles.actionsCell}>
                     <div className={styles.tableActions}>
                       <UpdateMovie id={movie.id} />
-                      <DeleteMovieConfirmButton id={movie.id} />
+                      <DeleteMovieButton id={movie.id} />
                     </div>
                   </td>
                 </tr>
