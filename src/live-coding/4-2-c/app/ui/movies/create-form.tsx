@@ -1,7 +1,9 @@
 'use client';
 
-import { createMovie } from '@/lib/actions';
-import { validateMovie, type MovieFormErrors } from '@/model/validation';
+import {
+  type MovieFormErrors,
+  validateMovie,
+} from '@/model/validation';
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
@@ -13,7 +15,8 @@ import {
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import styles from './create-form.module.css';
+import styles from './form.module.css';
+import { createMovie } from '@/lib/actions';
 import { toast } from 'sonner';
 
 export default function CreateMovieForm() {
@@ -29,15 +32,15 @@ export default function CreateMovieForm() {
 
     const formData = new FormData(e.currentTarget);
     const movieData = {
-      title: formData.get('title'),
-      director: formData.get('director'),
-      genre: formData.get('genre'),
+      title: String(formData.get('title') ?? ''),
+      director: String(formData.get('director') ?? ''),
+      genre: String(formData.get('genre') ?? ''),
       release_year: Number(formData.get('release_year')),
-      rating: formData.get('rating'),
+      rating: String(formData.get('rating') ?? ''),
       duration_minutes: Number(formData.get('duration_minutes')),
       purchase_price: Math.round(Number(formData.get('purchase_price')) * 100),
       rental_price: Math.round(Number(formData.get('rental_price')) * 100),
-      status: formData.get('status')  // Returns null when no option is selected
+      status: String(formData.get('status') ?? ''),
     };
     const validationResult = validateMovie(movieData);
 
@@ -45,6 +48,10 @@ export default function CreateMovieForm() {
       setFieldErrors(validationResult.fieldErrors);
       setErrorMessage(validationResult.message);
       return;
+    } else {
+      toast.success('Movie created successfully!');
+      router.push('/dashboard/movies');
+      router.refresh();
     }
 
     setFieldErrors({});
@@ -57,12 +64,6 @@ export default function CreateMovieForm() {
       if (!result.success) {
         setFieldErrors(result.errors ?? {});
         setErrorMessage(result.message ?? 'Failed to save movie.');
-      } else {
-        setTimeout(() => {
-          toast.success('Movie created successfully!');
-        }, 500);
-        router.push('/dashboard/movies');
-        router.refresh();
       }
     } finally {
       setIsCreating(false);
@@ -85,7 +86,6 @@ export default function CreateMovieForm() {
               placeholder="Enter movie title"
               className={styles.input}
               aria-describedby="title-error"
-              aria-invalid={fieldErrors.title ? 'true' : 'false'}
             />
             <FilmIcon className={styles.icon} />
           </div>
@@ -252,14 +252,12 @@ export default function CreateMovieForm() {
             <p className={styles.error}>{errorMessage}</p>
           ) : null}
         </div>
-        <div role="status">
-          {isCreating && (
-            <div className={styles.loadingOverlay}>
-              <span className={styles.spinner} aria-hidden="true" />
-              <span className="sr-only">Creating movie...</span>
-            </div>
-          )}
-        </div>
+        {isCreating && (
+          <div className={styles.loadingOverlay} role="status">
+            <span className={styles.spinner} aria-hidden="true" />
+            <span className="sr-only">Creating movie...</span>
+          </div>
+        )}
       </fieldset>
       <div className={styles.actions}>
         <button

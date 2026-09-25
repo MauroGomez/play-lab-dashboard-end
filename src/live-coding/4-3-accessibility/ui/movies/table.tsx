@@ -74,6 +74,7 @@ export default async function MoviesTable({
                   <td className={styles.titleCell}>
                     <p className={styles.title}>{movie.title}</p>
                     <p className={styles.smallMutedText}>
+                      {/* {movie.rating + " · "  + movie.duration_minutes + " min"} */}
                       {movie.rating} · {movie.duration_minutes} min
                     </p>
                   </td>
@@ -94,7 +95,7 @@ export default async function MoviesTable({
                   <td className={styles.actionsCell}>
                     <div className={styles.tableActions}>
                       <UpdateMovie id={movie.id} />
-                      <DeleteMovieButton id={movie.id} title={movie.title} />
+                      <DeleteMovieButton id={movie.id} title={movie.title}/>
                     </div>
                   </td>
                 </tr>

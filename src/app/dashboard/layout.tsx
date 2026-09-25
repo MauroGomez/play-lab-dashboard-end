@@ -1,3 +1,4 @@
+import { Toaster } from 'sonner';
 import SideNav from '@/ui/dashboard/sidenav';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <SideNav />
       </div>
       <div className="grow p-6 md:overflow-y-auto md:p-12">{children}</div>
+      <Toaster position="top-right" />
     </div>
   );
 }

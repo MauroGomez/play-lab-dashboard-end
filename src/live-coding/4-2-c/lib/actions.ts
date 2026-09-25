@@ -218,8 +218,6 @@ export async function createMovie(
       message: 'Failed to create movie.',
     };
   }
-
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate a delay for demonstration purposes
   
   // revalidatePath('/dashboard/movies');
   // redirect('/dashboard/movies');
