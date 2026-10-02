@@ -1,10 +1,12 @@
+import 'server-only';
+
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
 import { z } from 'zod';
-import type { User } from '@/model/definitions';
-import { authConfig } from './auth.config';
+import type { Role, User } from '@/model/definitions';
+import { authConfig, authEnabled } from './auth.config';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -34,7 +36,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!user) return null;
 
           const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) return user;
+          // Return only what NextAuth needs (never the password hash)
+          if (passwordsMatch) {
+            return { id: user.id, name: user.name, email: user.email, role: user.role };
+          }
         }
 
         console.log('Invalid credentials');
@@ -43,3 +48,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 });
+
+// Role of the logged-in user. With authentication disabled everyone is admin.
+export async function getCurrentRole(): Promise<Role | undefined> {
+  if (!authEnabled) return 'admin';
+  const session = await auth();
+  return session?.user?.role;
+}
