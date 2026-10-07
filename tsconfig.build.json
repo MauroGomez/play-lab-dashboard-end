@@ -1,0 +1,7 @@
+{
+  // Used only by `next build` (see next.config.ts): same as tsconfig.json but
+  // without src/live-coding (work-in-progress code that may not compile).
+  // The editor keeps using tsconfig.json, so live-coding still gets type info.
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "src/live-coding"]
+}
