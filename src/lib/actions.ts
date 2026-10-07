@@ -8,6 +8,7 @@ import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { MovieFormErrors, validateMovie } from '@/model/validation';
 import { createMovieData, deleteMovieData } from '@/model/data';
+import { can } from '@/lib/authorization';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -81,6 +82,10 @@ export type MovieState = {
 };
 
 export async function createInvoice(prevState: State, formData: FormData) {
+  if (!(await can('invoices:create'))) {
+    return { message: 'Unauthorized: you cannot create invoices.' };
+  }
+
   // Validate form fields using Zod
   const validatedFields = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
@@ -135,6 +140,10 @@ export async function updateInvoice(
   prevState: State,
   formData: FormData,
 ) {
+  if (!(await can('invoices:update'))) {
+    return { message: 'Unauthorized: you cannot update invoices.' };
+  }
+
   const validatedFields = UpdateInvoice.safeParse({
     customerId: formData.get('customerId'),
     movieId: formData.get('movieId'),
@@ -186,6 +195,9 @@ export async function updateInvoice(
 }
 
 export async function deleteInvoice(id: string) {
+  if (!(await can('invoices:delete'))) {
+    throw new Error('Unauthorized: you cannot delete invoices.');
+  }
   await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
 }
@@ -199,6 +211,14 @@ type CreateMovieState = {
 export async function createMovie(
   movieData: unknown,
 ): Promise<CreateMovieState> {
+  if (!(await can('movies:create'))) {
+    return {
+      success: false,
+      errors: {},
+      message: 'Unauthorized: you cannot create movies.',
+    };
+  }
+
   const validationResult = validateMovie(movieData);
 
   if (!validationResult.success) {
@@ -236,6 +256,10 @@ export async function updateMovie(
   prevState: MovieState,
   formData: FormData,
 ) {
+  if (!(await can('movies:update'))) {
+    return { message: 'Unauthorized: you cannot update movies.' };
+  }
+
   const validatedFields = UpdateMovie.safeParse({
     title: formData.get('title'),
     director: formData.get('director'),
@@ -294,6 +318,9 @@ export async function updateMovie(
 }
 
 export async function deleteMovie(id: string) {
+  if (!(await can('movies:delete'))) {
+    throw new Error('Unauthorized: you cannot delete movies.');
+  }
   await deleteMovieData(id);
   revalidatePath('/dashboard/movies');
 }

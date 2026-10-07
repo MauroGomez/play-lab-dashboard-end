@@ -4,12 +4,16 @@ import DeleteMovieButton from '@/ui/movies/delete-button';
 import MovieStatus from '@/ui/movies/status';
 import styles from './table.module.css';
 import { Movie } from '@/model/definitions';
+import { can } from '@/lib/authorization';
 
 export default async function MoviesTable({
   movies
 }: {
   movies: Movie[];
 }) {
+  const canUpdate = await can('movies:update');
+  const canDelete = await can('movies:delete');
+
   return (
     <div className={styles.root}>
       <div className={styles.container}>
@@ -35,8 +39,8 @@ export default async function MoviesTable({
                     </p>
                   </div>
                   <div className={styles.actions}>
-                    <UpdateMovie id={movie.id} />
-                    <DeleteMovieButton id={movie.id} title={movie.title} />
+                    {canUpdate && <UpdateMovie id={movie.id} />}
+                    {canDelete && <DeleteMovieButton id={movie.id} title={movie.title} />}
                   </div>
                 </div>
               </div>
@@ -93,8 +97,8 @@ export default async function MoviesTable({
                   </td>
                   <td className={styles.actionsCell}>
                     <div className={styles.tableActions}>
-                      <UpdateMovie id={movie.id} />
-                      <DeleteMovieButton id={movie.id} title={movie.title} />
+                      {canUpdate && <UpdateMovie id={movie.id} />}
+                      {canDelete && <DeleteMovieButton id={movie.id} title={movie.title} />}
                     </div>
                   </td>
                 </tr>

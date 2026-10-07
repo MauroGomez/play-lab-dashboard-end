@@ -2,13 +2,16 @@ import { getMovieData } from '@/model/data';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import Form from '@/ui/movies/edit-form';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { can } from '@/lib/authorization';
 
 export const metadata: Metadata = {
   title: 'Edit Movie',
 };
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
+  if (!(await can('movies:update'))) redirect('/dashboard');
+
   const params = await props.params;
   const movie = await getMovieData(params.id);
 

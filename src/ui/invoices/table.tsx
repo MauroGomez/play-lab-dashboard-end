@@ -3,6 +3,7 @@ import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/buttons';
 import InvoiceStatus from '@/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
 import { getFilteredInvoicesData } from '@/model/data';
+import { can } from '@/lib/authorization';
 
 export default async function InvoicesTable({
   query,
@@ -11,6 +12,8 @@ export default async function InvoicesTable({
   query: string;
   currentPage: number;
 }) {
+  const canUpdate = await can('invoices:update');
+  const canDelete = await can('invoices:delete');
   const invoices = await getFilteredInvoicesData(query, currentPage);
 
   return (
@@ -53,8 +56,8 @@ export default async function InvoicesTable({
                     <p>{formatDateToLocal(invoice.date)}</p>
                   </div>
                   <div className="flex justify-end gap-2">
-                    <UpdateInvoice id={invoice.id} />
-                    <DeleteInvoice id={invoice.id} />
+                    {canUpdate && <UpdateInvoice id={invoice.id} />}
+                    {canDelete && <DeleteInvoice id={invoice.id} />}
                   </div>
                 </div>
               </div>
@@ -127,8 +130,8 @@ export default async function InvoicesTable({
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
-                      <UpdateInvoice id={invoice.id} />
-                      <DeleteInvoice id={invoice.id} />
+                      {canUpdate && <UpdateInvoice id={invoice.id} />}
+                      {canDelete && <DeleteInvoice id={invoice.id} />}
                     </div>
                   </td>
                 </tr>

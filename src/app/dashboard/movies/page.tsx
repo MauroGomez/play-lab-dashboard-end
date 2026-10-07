@@ -5,8 +5,10 @@ import { CreateMovie } from '@/ui/movies/buttons';
 import { lusitana } from '@/ui/fonts';
 import { getFilteredMoviesData, getMoviesPagesData } from '@/model/data';
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { MoviesTableSkeleton } from '@/ui/skeletons';
+import { can } from '@/lib/authorization';
 
 export const metadata: Metadata = {
   title: 'Movies',
@@ -18,11 +20,14 @@ export default async function Page(props: {
     page?: string;
   }>;
 }) {
+  if (!(await can('movies:read'))) redirect('/dashboard');
+
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
   const totalPages = await getMoviesPagesData(query);
+  const canCreate = await can('movies:create');
 
   return (
     <div className="w-full">
@@ -31,7 +36,7 @@ export default async function Page(props: {
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search movies..." />
-        <CreateMovie />
+        {canCreate && <CreateMovie />}
       </div>
       <Suspense key={query + currentPage} fallback={<MoviesTableSkeleton/>}>
         <MoviesTableWrapper query={query} currentPage={currentPage} />

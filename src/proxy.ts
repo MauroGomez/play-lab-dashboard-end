@@ -1,10 +1,9 @@
-import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authConfig, authEnabled } from './auth.config';
+import { auth, authEnabled } from '@/auth';
 
-export default authEnabled
-  ? NextAuth(authConfig).auth
-  : () => NextResponse.next();
+// Authentication only: the `authorized` callback in auth.ts decides
+// whether the request needs to be redirected to the login page.
+export default authEnabled ? auth : () => NextResponse.next();
 
 export const config = {
   // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
