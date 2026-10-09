@@ -3,18 +3,25 @@
 const users = [
   {
     id: '410544b2-4001-4271-9855-fec4b6a6442a',
-    name: 'User',
-    email: 'user@nextmail.com',
+    name: 'Alicia',
+    email: 'alicia@nextmail.com',
     password: '123456',
     role: 'admin',
   },
   {
     id: '7c3f1e2a-9b4d-4e6f-8a1c-2d5b7e9f0a13',
-    name: 'Editor',
-    email: 'editor@nextmail.com',
+    name: 'Beto',
+    email: 'beto@nextmail.com',
     password: '123456',
     role: 'editor',
   },
+  {
+    id: 'd1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6g',
+    name: 'Carla',
+    email: 'carla@nextmail.com',
+    password: '123456',
+    role: 'viewer',
+  }
 ];
 
 const customers = [

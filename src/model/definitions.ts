@@ -3,7 +3,7 @@
 // For simplicity of teaching, we're manually defining these types.
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 
-export type Role = 'admin' | 'editor';
+export type Role = 'admin' | 'editor' | 'viewer';
 
 export type User = {
   id: string;

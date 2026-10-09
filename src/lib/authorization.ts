@@ -27,6 +27,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     'customers:read',
   ],
   editor: ['movies:create', 'movies:read', 'movies:update', 'customers:read'],
+  viewer: ['movies:read', 'customers:read'],
 };
 
 // Role of the logged-in user, taken from the session (never from the client).

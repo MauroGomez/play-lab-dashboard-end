@@ -5,8 +5,12 @@ import postgres from 'postgres';
 import { z } from 'zod';
 import type { Role, User } from '@/model/definitions';
 
-// Authentication is only enforced when both env vars are defined
-export const authEnabled = !!process.env.AUTH_SECRET && !!process.env.AUTH_URL;
+// Authentication is on by default; set AUTH_DISABLED=true to turn it off (development only).
+// Compare against the exact string: env vars are strings, so "false" would be truthy.
+export const authEnabled = process.env.AUTH_DISABLED !== 'true';
+if (!authEnabled && process.env.NODE_ENV === 'production') {
+  throw new Error('AUTH_DISABLED=true is not allowed in production');
+}
 
 // Add `role` to the type of the user (and therefore of session.user)
 declare module 'next-auth' {
@@ -74,7 +78,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     // Used by the proxy (src/proxy.ts) on every request
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
+      // const isLoggedIn = !!auth?.user;
+      console.log("auth:", auth);
+      const isLoggedIn = !!auth;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       if (isOnDashboard) {
         if (isLoggedIn) return true;

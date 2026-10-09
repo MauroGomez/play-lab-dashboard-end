@@ -1,50 +1,59 @@
 import Link from 'next/link';
 import NavLinks from '@/ui/dashboard/nav-links';
 import AcmeLogo from '@/ui/acme-logo';
-import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline';
-import { authEnabled, signOut } from '@/auth';
+import { ArrowRightStartOnRectangleIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { auth, authEnabled, signOut } from '@/auth';
 import { can } from '@/lib/authorization';
+import styles from './sidenav.module.css';
 
 export default async function SideNav() {
   // NavLinks is a client component: permissions are checked here (server) and passed as props
   const canReadInvoices = await can('invoices:read');
   const canReadMovies = await can('movies:read');
   const canReadCustomers = await can('customers:read');
+  // `name` is kept by NextAuth by default; `role` is copied in the jwt/session callbacks
+  const user = authEnabled ? (await auth())?.user : undefined;
 
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
+    <div className={styles.root}>
       <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
+        className={styles.logoLink}
         href="/"
       >
-        <div className="w-32 text-white md:w-40">
+        <div className={styles.logo}>
           <AcmeLogo />
         </div>
       </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+      <div className={styles.nav}>
         <NavLinks
           canReadInvoices={canReadInvoices}
           canReadMovies={canReadMovies}
           canReadCustomers={canReadCustomers}
         />
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-        {authEnabled ?
-          <form
-            action={async () => {
-              'use server';
-              await signOut({ redirectTo: '/' });
-            }}
-          >
-            <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-              <ArrowRightStartOnRectangleIcon className="w-6" />
-              <div className="hidden md:block">Sign Out</div>
-            </button>
-          </form>
-          :
-          <Link href="/" className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-            <ArrowRightStartOnRectangleIcon className="w-6" />
-            <div className="hidden md:block">Leave</div>
-          </Link>}
+        <div className={styles.spacer}></div>
+        {user && (
+          <div className={styles.userBox}>
+            <UserCircleIcon className={styles.userIcon} aria-hidden="true" />
+            <div className={styles.userInfo}>
+              <p className={styles.userName}>{user.name}</p>
+              <p className={styles.userRole}>{user.role}</p>
+            </div>
+            <form
+              action={async () => {
+                'use server';
+                await signOut({ redirectTo: '/' });
+              }}
+            >
+              <button
+                title="Sign Out"
+                aria-label="Sign Out"
+                className={styles.signOutButton}
+              >
+                <ArrowRightStartOnRectangleIcon className={styles.signOutIcon} />
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
