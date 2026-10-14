@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { deleteMovieData, getMovieData, updateMovieData, type MovieInput } from '@/model/data';
+import { can } from '@/lib/authorization';
 
 type RouteContext = {
   params: Promise<{
@@ -63,6 +64,14 @@ export async function PUT(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
+
+  if (!(await can('movies:delete'))) {
+    return NextResponse.json(
+      { message: 'Forbidden: you cannot delete movies.' },
+      { status: 403 },
+    );
+  }
+
   const { id } = await context.params;
 
   try {
