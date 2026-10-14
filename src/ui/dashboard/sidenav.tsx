@@ -2,7 +2,7 @@ import Link from 'next/link';
 import NavLinks from '@/ui/dashboard/nav-links';
 import AcmeLogo from '@/ui/acme-logo';
 import { ArrowRightStartOnRectangleIcon, UserCircleIcon } from '@heroicons/react/24/outline';
-import { auth, authEnabled, signOut } from '@/auth';
+import { auth, signOut } from '@/auth';
 import { can } from '@/lib/authorization';
 import styles from './sidenav.module.css';
 
@@ -12,7 +12,7 @@ export default async function SideNav() {
   const canReadMovies = await can('movies:read');
   const canReadCustomers = await can('customers:read');
   // `name` is kept by NextAuth by default; `role` is copied in the jwt/session callbacks
-  const user = authEnabled ? (await auth())?.user : undefined;
+  const user = (await auth())?.user;
 
   return (
     <div className={styles.root}>

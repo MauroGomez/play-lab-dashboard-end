@@ -5,13 +5,6 @@ import postgres from 'postgres';
 import { z } from 'zod';
 import type { Role, User } from '@/model/definitions';
 
-// Authentication is on by default; set AUTH_DISABLED=true to turn it off (development only).
-// Compare against the exact string: env vars are strings, so "false" would be truthy.
-export const authEnabled = process.env.AUTH_DISABLED !== 'true';
-if (!authEnabled && process.env.NODE_ENV === 'production') {
-  throw new Error('AUTH_DISABLED=true is not allowed in production');
-}
-
 // Add `role` to the type of the user (and therefore of session.user)
 declare module 'next-auth' {
   interface User {

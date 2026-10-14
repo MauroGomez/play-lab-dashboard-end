@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { auth, authEnabled } from '@/auth';
+import { auth } from '@/auth';
 import type { Role } from '@/model/definitions';
 
 export type Permission =
@@ -31,9 +31,7 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
 };
 
 // Role of the logged-in user, taken from the session (never from the client).
-// With authentication disabled everyone is admin.
 async function getCurrentRole(): Promise<Role | undefined> {
-  if (!authEnabled) return 'admin';
   const session = await auth();
   return session?.user?.role;
 }
