@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import styles from './status.module.css';
 
 const labels = {
   available: 'Available',
@@ -13,14 +14,7 @@ export default function MovieStatus({
 }) {
   return (
     <span
-      className={clsx(
-        'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
-        {
-          'bg-green-500 text-white': status === 'available',
-          'bg-gray-100 text-gray-600': status === 'draft',
-          'bg-red-100 text-red-700': status === 'archived',
-        },
-      )}
+      className={clsx(styles.status, styles[status])}
     >
       {labels[status]}
     </span>

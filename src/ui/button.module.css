@@ -1,0 +1,33 @@
+.button {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  border-radius: 8px;
+  background-color: #0070f3;
+  padding: 0 16px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: #fff;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.button:hover {
+  background-color: #2589fe;
+}
+
+.button:focus-visible {
+  outline: 2px solid #0070f3;
+  outline-offset: 2px;
+}
+
+.button:active {
+  background-color: #2f6feb;
+}
+
+.button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

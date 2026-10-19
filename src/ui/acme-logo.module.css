@@ -1,0 +1,17 @@
+.logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  line-height: 1;
+  color: #fff;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  margin-right: 8px;
+}
+
+.text {
+  font-size: 44px;
+}
