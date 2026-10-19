@@ -1,9 +1,5 @@
-import Pagination from '@/ui/pagination';
-import Search from '@/ui/search';
-import MoviesTable from '@/ui/movies/table';
-import { CreateMovie } from '@/ui/movies/buttons';
-import { lusitana } from '@/ui/fonts';
-import { getFilteredMoviesData, getMoviesPagesData } from '@/model/data';
+import { getFilteredMoviesData, getMoviesPagesData, getMoviesPagesDataUncached } from '@/model/data';
+import MoviesView from '@/ui/movies/view';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -20,22 +16,11 @@ export default async function Page(props: {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await getMoviesPagesData(query);
   const movies = await getFilteredMoviesData(query, currentPage);
+  const totalPages = await getMoviesPagesDataUncached(query);
 
   return (
-    <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Movies</h1>
-      </div>
-      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="Search movies..." />
-        <CreateMovie />
-      </div>
-      <MoviesTable movies={movies} />
-      <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div>
-    </div>
+    <MoviesView movies={movies} totalPages={totalPages} />
   );
 }
+

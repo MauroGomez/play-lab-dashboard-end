@@ -1,16 +1,21 @@
 import { formatCurrency } from '@/lib/utils';
 import { UpdateMovie } from '@/ui/movies/buttons';
-import DeleteMovieButton from '@/ui/movies/delete-button';
+import DeleteMovie from '@/ui/movies/delete-button';
 import MovieStatus from '@/ui/movies/status';
 import styles from './table.module.css';
-import { Movie } from '@/model/definitions';
 import { can } from '@/lib/authorization';
+import { getFilteredMoviesData } from '@/model/data';
 
 export default async function MoviesTable({
-  movies
+  query,
+  currentPage
 }: {
-  movies: Movie[];
+  query: string;
+  currentPage: number;
 }) {
+
+  const movies = await getFilteredMoviesData(query, currentPage);
+
   const canUpdate = await can('movies:update');
   const canDelete = await can('movies:delete');
 
@@ -40,7 +45,7 @@ export default async function MoviesTable({
                   </div>
                   <div className={styles.actions}>
                     {canUpdate && <UpdateMovie id={movie.id} />}
-                    {canDelete && <DeleteMovieButton id={movie.id} title={movie.title} />}
+                    {canDelete && <DeleteMovie id={movie.id} title={movie.title} />}
                   </div>
                 </div>
               </div>
@@ -98,7 +103,7 @@ export default async function MoviesTable({
                   <td className={styles.actionsCell}>
                     <div className={styles.tableActions}>
                       {canUpdate && <UpdateMovie id={movie.id} />}
-                      {canDelete && <DeleteMovieButton id={movie.id} title={movie.title} />}
+                      {canDelete && <DeleteMovie id={movie.id} title={movie.title} />}
                     </div>
                   </td>
                 </tr>

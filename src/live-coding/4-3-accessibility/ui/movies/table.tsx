@@ -1,15 +1,20 @@
 import { formatCurrency } from '@/lib/utils';
 import { UpdateMovie } from '@/ui/movies/buttons';
-import DeleteMovieButton from '@/ui/movies/delete-button';
+import DeleteMovie from '@/ui/movies/delete-button';
 import MovieStatus from '@/ui/movies/status';
 import styles from './table.module.css';
-import { Movie } from '@/model/definitions';
+import { getFilteredMoviesData } from '@/model/data';
 
 export default async function MoviesTable({
-  movies
+  query,
+  currentPage
 }: {
-  movies: Movie[];
+  query: string;
+  currentPage: number;
 }) {
+
+  const movies = await getFilteredMoviesData(query, currentPage);
+
   return (
     <div className={styles.root}>
       <div className={styles.container}>
@@ -36,7 +41,7 @@ export default async function MoviesTable({
                   </div>
                   <div className={styles.actions}>
                     <UpdateMovie id={movie.id} />
-                    <DeleteMovieButton id={movie.id} title={movie.title} />
+                    <DeleteMovie id={movie.id} title={movie.title}/>
                   </div>
                 </div>
               </div>
@@ -95,7 +100,7 @@ export default async function MoviesTable({
                   <td className={styles.actionsCell}>
                     <div className={styles.tableActions}>
                       <UpdateMovie id={movie.id} />
-                      <DeleteMovieButton id={movie.id} title={movie.title}/>
+                      <DeleteMovie id={movie.id} title={movie.title}/>
                     </div>
                   </td>
                 </tr>

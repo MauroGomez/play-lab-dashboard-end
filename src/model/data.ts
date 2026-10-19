@@ -226,7 +226,7 @@ export async function getFilteredCustomersData(query: string) {
   }
 }
 
-export async function getFilteredMoviesData(query: string, currentPage: number) {
+export async function getFilteredMoviesData(query: string = "", currentPage: number = 1) {
   // console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
   // await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -282,7 +282,7 @@ export async function getMovieSummariesData() {
   }
 }
 
-async function getMoviesPagesDataUncached(query: string) {
+export async function getMoviesPagesDataUncached(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
