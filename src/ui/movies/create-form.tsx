@@ -15,6 +15,7 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import styles from './create-form.module.css';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 export default function CreateMovieForm() {
   const router = useRouter();
@@ -262,14 +263,9 @@ export default function CreateMovieForm() {
         </div>
       </fieldset>
       <div className={styles.actions}>
-        <button
-          type="button"
-          className={styles.cancelButton}
-          disabled={isCreating}
-          onClick={() => router.push('/dashboard/movies')}
-        >
+        <Link href="/dashboard/movies" className={styles.cancelButton}>
           Cancel
-        </button>
+        </Link>
         <Button type="submit" disabled={isCreating} aria-disabled={isCreating}>
           Create Movie
         </Button>
