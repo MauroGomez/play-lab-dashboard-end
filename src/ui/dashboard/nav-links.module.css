@@ -1,0 +1,40 @@
+.link {
+  display: flex;
+  height: 48px;
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.link:hover,
+.active {
+  background-color: #e0f2fe;
+  color: #2f6feb;
+}
+
+.icon {
+  width: 24px;
+}
+
+.label {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .link {
+    flex: none;
+    justify-content: flex-start;
+    padding: 8px 12px;
+  }
+
+  .label {
+    display: block;
+  }
+}
