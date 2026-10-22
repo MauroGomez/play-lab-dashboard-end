@@ -10,12 +10,12 @@ import {
   TagIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import styles from './create-form.module.css';
 import { toast } from 'sonner';
-import Link from 'next/link';
+import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
   const router = useRouter();

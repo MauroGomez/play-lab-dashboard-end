@@ -1,5 +1,6 @@
 'use client';
-import { validateMovie, MovieFormErrors } from '@/model/validation'
+import { createMovie } from '@/lib/actions';
+import { validateMovie, MovieFormErrors } from '@/model/validation';
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
@@ -9,13 +10,11 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
-  const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
@@ -45,24 +44,13 @@ export default function CreateMovieForm() {
     setFieldErrors({});
     setErrorMessage(null);
 
-    const response = await fetch('/api/movies', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(movieData),
-    });
+    const result = await createMovie(movieData);
 
-    if (!response.ok) {
-      const errorResponse = (await response.json());
-
-      setFieldErrors(errorResponse.errors ?? {});
-      setErrorMessage(errorResponse.message ?? 'Failed to save movie.');
+    if (!result.success) {
+      setFieldErrors(result.errors ?? {});
+      setErrorMessage(result.message ?? 'Failed to save movie.');
       return;
     }
-
-    router.push('/dashboard/movies');
-    router.refresh();
 
   }
 
@@ -80,7 +68,6 @@ export default function CreateMovieForm() {
               type="text"
               placeholder="Enter movie title"
               className={styles.input}
-              aria-describedby="title-error"
             />
             <FilmIcon className={styles.icon} />
           </div>
@@ -117,7 +104,6 @@ export default function CreateMovieForm() {
                 type="text"
                 placeholder="Drama, action, comedy..."
                 className={styles.input}
-                aria-describedby="genre-error"
               />
               <TagIcon className={styles.icon} />
             </div>
@@ -155,7 +141,6 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="2024"
                 className={styles.input}
-                aria-describedby="release-year-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
@@ -173,7 +158,6 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="120"
                 className={styles.input}
-                aria-describedby="duration-minutes-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
@@ -192,7 +176,6 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="12.99"
                 className={styles.input}
-                aria-describedby="purchase-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
@@ -213,7 +196,6 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="4.99"
                 className={styles.input}
-                aria-describedby="rental-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
@@ -228,7 +210,6 @@ export default function CreateMovieForm() {
               id="status"
               name="status"
               className={styles.select}
-              aria-describedby="status-error"
               defaultValue=""
             >
               <option value="" disabled>
@@ -249,13 +230,12 @@ export default function CreateMovieForm() {
         </div>
       </fieldset>
       <div className={styles.actions}>
-        <Link
-          href="/dashboard/movies"
-          className={styles.cancelLink}
-        >
+        <Link href="/dashboard/movies" className={styles.cancelButton}>
           Cancel
         </Link>
-        <Button type="submit">{'Create Movie'}</Button>
+        <Button type="submit">
+          Create Movie
+        </Button>
       </div>
     </form>
   );

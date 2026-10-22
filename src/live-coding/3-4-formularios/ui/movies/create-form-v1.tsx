@@ -1,6 +1,4 @@
 'use client';
-import { createMovie } from '@/lib/actions';
-import { validateMovie, MovieFormErrors } from '@/model/validation'
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
@@ -10,14 +8,12 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
-import { useState } from 'react';
 import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
-
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
+  const router = useRouter();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,24 +29,17 @@ export default function CreateMovieForm() {
       rental_price: Math.round(Number(formData.get('rental_price')) * 100),
       status: formData.get('status')  // Returns null when no option is selected
     };
-    const validationResult = validateMovie(movieData);
 
-    if (!validationResult.success) {
-      setFieldErrors(validationResult.fieldErrors);
-      setErrorMessage(validationResult.message);
-      return;
-    }
+    await fetch('/api/movies', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(movieData),
+    });
 
-    setFieldErrors({});
-    setErrorMessage(null);
-
-    const result = await createMovie(movieData);
-
-    if (!result.success) {
-      setFieldErrors(result.errors ?? {});
-      setErrorMessage(result.message ?? 'Failed to save movie.');
-      return;
-    }
+    router.push('/dashboard/movies');
+    router.refresh();
 
   }
 
@@ -68,11 +57,9 @@ export default function CreateMovieForm() {
               type="text"
               placeholder="Enter movie title"
               className={styles.input}
-              aria-describedby="title-error"
             />
             <FilmIcon className={styles.icon} />
           </div>
-          <FieldErrors id="title-error" errors={fieldErrors.title} />
         </div>
 
         <div className={styles.field}>
@@ -90,7 +77,6 @@ export default function CreateMovieForm() {
             />
             <UserIcon className={styles.icon} />
           </div>
-          <FieldErrors id="director-error" errors={fieldErrors.director} />
         </div>
 
         <div className={styles.gridTwoColumns}>
@@ -105,11 +91,9 @@ export default function CreateMovieForm() {
                 type="text"
                 placeholder="Drama, action, comedy..."
                 className={styles.input}
-                aria-describedby="genre-error"
               />
               <TagIcon className={styles.icon} />
             </div>
-            <FieldErrors id="genre-error" errors={fieldErrors.genre} />
           </div>
 
           <div className={styles.field}>
@@ -127,7 +111,6 @@ export default function CreateMovieForm() {
               />
               <TagIcon className={styles.icon} />
             </div>
-            <FieldErrors id="rating-error" errors={fieldErrors.rating} />
           </div>
         </div>
 
@@ -143,11 +126,9 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="2024"
                 className={styles.input}
-                aria-describedby="release-year-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
-            <FieldErrors id="release-year-error" errors={fieldErrors.release_year} />
           </div>
 
           <div className={styles.field}>
@@ -161,11 +142,9 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="120"
                 className={styles.input}
-                aria-describedby="duration-minutes-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
-            <FieldErrors id="duration-minutes-error" errors={fieldErrors.duration_minutes} />
           </div>
 
           <div className={styles.field}>
@@ -180,11 +159,9 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="12.99"
                 className={styles.input}
-                aria-describedby="purchase-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
-            <FieldErrors id="purchase-price-error" errors={fieldErrors.purchase_price} />
           </div>
         </div>
 
@@ -201,11 +178,9 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="4.99"
                 className={styles.input}
-                aria-describedby="rental-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
-            <FieldErrors id="rental-price-error" errors={fieldErrors.rental_price} />
           </div>
 
           <div className={styles.field}>
@@ -216,7 +191,6 @@ export default function CreateMovieForm() {
               id="status"
               name="status"
               className={styles.select}
-              aria-describedby="status-error"
               defaultValue=""
             >
               <option value="" disabled>
@@ -226,37 +200,18 @@ export default function CreateMovieForm() {
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
-            <FieldErrors id="status-error" errors={fieldErrors.status} />
           </div>
-        </div>
-
-        <div aria-live="polite" aria-atomic="true">
-          {errorMessage ? (
-            <p className={styles.error}>{errorMessage}</p>
-          ) : null}
         </div>
       </fieldset>
       <div className={styles.actions}>
-        <Link
-          href="/dashboard/movies"
-          className={styles.cancelLink}
-        >
+        <Link href="/dashboard/movies" className={styles.cancelButton}>
           Cancel
         </Link>
-        <Button type="submit">{'Create Movie'}</Button>
+        <Button type="submit">
+          Create Movie
+        </Button>
       </div>
     </form>
   );
 }
 
-function FieldErrors({ id, errors }: { id: string; errors?: string[] }) {
-  return (
-    <div id={id} aria-live="polite" aria-atomic="true">
-      {errors?.map((error) => (
-        <p className={styles.error} key={error}>
-          {error}
-        </p>
-      ))}
-    </div>
-  );
-}
