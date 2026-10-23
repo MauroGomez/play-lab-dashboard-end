@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
@@ -44,6 +45,10 @@ export default function CreateMovieForm() {
       setFieldErrors(validationResult.fieldErrors);
       setErrorMessage(validationResult.message);
       return;
+    } else {
+      toast.success('Movie created successfully!');
+      router.push('/dashboard/movies');
+      router.refresh();
     }
 
     setFieldErrors({});
@@ -238,9 +243,8 @@ export default function CreateMovieForm() {
           ) : null}
         </div>
         {isCreating && (
-          <div className={styles.loadingOverlay} role="status">
-            <span className={styles.spinner} aria-hidden="true" />
-            <span className="sr-only">Creating movie...</span>
+          <div className={styles.loadingOverlay}>
+            <span className={styles.spinner}/>            
           </div>
         )}
       </fieldset>

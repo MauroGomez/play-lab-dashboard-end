@@ -13,8 +13,7 @@ import {
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { toast } from 'sonner';
-import styles from './form.module.css';
+import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
   const router = useRouter();
@@ -45,10 +44,6 @@ export default function CreateMovieForm() {
       setFieldErrors(validationResult.fieldErrors);
       setErrorMessage(validationResult.message);
       return;
-    } else {
-      toast.success('Movie created successfully!');
-      router.push('/dashboard/movies');
-      router.refresh();
     }
 
     setFieldErrors({});
@@ -69,7 +64,7 @@ export default function CreateMovieForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} aria-busy={isCreating}>
+    <form onSubmit={handleSubmit}>
       <fieldset className={styles.container} disabled={isCreating}>
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
@@ -82,7 +77,6 @@ export default function CreateMovieForm() {
               type="text"
               placeholder="Enter movie title"
               className={styles.input}
-              aria-describedby="title-error"
             />
             <FilmIcon className={styles.icon} />
           </div>
@@ -119,7 +113,6 @@ export default function CreateMovieForm() {
                 type="text"
                 placeholder="Drama, action, comedy..."
                 className={styles.input}
-                aria-describedby="genre-error"
               />
               <TagIcon className={styles.icon} />
             </div>
@@ -157,7 +150,6 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="2024"
                 className={styles.input}
-                aria-describedby="release-year-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
@@ -175,7 +167,6 @@ export default function CreateMovieForm() {
                 type="number"
                 placeholder="120"
                 className={styles.input}
-                aria-describedby="duration-minutes-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
@@ -194,7 +185,6 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="12.99"
                 className={styles.input}
-                aria-describedby="purchase-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
@@ -215,7 +205,6 @@ export default function CreateMovieForm() {
                 step="0.01"
                 placeholder="4.99"
                 className={styles.input}
-                aria-describedby="rental-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
@@ -230,7 +219,6 @@ export default function CreateMovieForm() {
               id="status"
               name="status"
               className={styles.select}
-              aria-describedby="status-error"
               defaultValue=""
             >
               <option value="" disabled>
@@ -250,9 +238,8 @@ export default function CreateMovieForm() {
           ) : null}
         </div>
         {isCreating && (
-          <div className={styles.loadingOverlay} role="status">
-            <span className={styles.spinner} aria-hidden="true" />
-            <span className="sr-only">Creating movie...</span>
+          <div className={styles.loadingOverlay}>
+            <span className={styles.spinner}/>            
           </div>
         )}
       </fieldset>
@@ -265,7 +252,7 @@ export default function CreateMovieForm() {
         >
           Cancel
         </button>
-        <Button type="submit" disabled={isCreating} aria-disabled={isCreating}>
+        <Button type="submit" disabled={isCreating}>
           Create Movie
         </Button>
       </div>

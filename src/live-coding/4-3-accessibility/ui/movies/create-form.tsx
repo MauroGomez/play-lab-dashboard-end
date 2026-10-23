@@ -1,9 +1,7 @@
 'use client';
 
-import {
-  type MovieFormErrors,
-  validateMovie,
-} from '@/model/validation';
+import { createMovie } from '@/lib/actions';
+import { type MovieFormErrors, validateMovie } from '@/model/validation';
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
@@ -15,9 +13,8 @@ import {
 import { useRouter } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import styles from './form.module.css';
-import { createMovie } from '@/lib/actions';
 import { toast } from 'sonner';
+import styles from './create-form.module.css';
 
 export default function CreateMovieForm() {
   const router = useRouter();
@@ -32,15 +29,15 @@ export default function CreateMovieForm() {
 
     const formData = new FormData(e.currentTarget);
     const movieData = {
-      title: String(formData.get('title') ?? ''),
-      director: String(formData.get('director') ?? ''),
-      genre: String(formData.get('genre') ?? ''),
+      title: formData.get('title'),
+      director: formData.get('director'),
+      genre: formData.get('genre'),
       release_year: Number(formData.get('release_year')),
-      rating: String(formData.get('rating') ?? ''),
+      rating: formData.get('rating'),
       duration_minutes: Number(formData.get('duration_minutes')),
       purchase_price: Math.round(Number(formData.get('purchase_price')) * 100),
       rental_price: Math.round(Number(formData.get('rental_price')) * 100),
-      status: String(formData.get('status') ?? ''),
+      status: formData.get('status')  // Returns null when no option is selected
     };
     const validationResult = validateMovie(movieData);
 

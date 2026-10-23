@@ -1,6 +1,7 @@
 'use client';
+
 import { createMovie } from '@/lib/actions';
-import { validateMovie, MovieFormErrors } from '@/model/validation';
+import { type MovieFormErrors, validateMovie } from '@/model/validation';
 import { Button } from '@/ui/button';
 import {
   BanknotesIcon,
