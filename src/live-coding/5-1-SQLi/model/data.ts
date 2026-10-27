@@ -20,7 +20,7 @@ export type Movie = MovieInput & {
 
 const ITEMS_PER_PAGE = 6;
 
-export async function getFilteredMoviesData(query: string, currentPage: number) {
+export async function getFilteredMovies(query: string, currentPage: number) {
   // console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
   // await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -31,7 +31,7 @@ export async function getFilteredMoviesData(query: string, currentPage: number) 
     // en el texto del SQL y se ejecuta con sql.unsafe(), desactivando la
     // parametrización que normalmente protege contra inyección.
     //
-    // Compará con getFilteredCustomersData / la versión original de esta misma
+    // Compará con getFilteredCustomers / la versión original de esta misma
     // función: allí `${`%${query}%`}` viaja como PARÁMETRO (seguro). Acá el valor
     // se interpola como TEXTO del query (inseguro).
     const columns =

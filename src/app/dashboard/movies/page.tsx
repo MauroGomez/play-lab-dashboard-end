@@ -1,4 +1,4 @@
-import { getMoviesPagesDataUncached } from '@/model/data';
+import { getMoviesPagesUncached } from '@/model/data';
 import MoviesView from '@/ui/movies/view';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -20,7 +20,7 @@ export default async function Page(props: {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await getMoviesPagesDataUncached(query);
+  const totalPages = await getMoviesPagesUncached(query);
 
   return (
     <MoviesView query={query} currentPage={currentPage} totalPages={totalPages} />

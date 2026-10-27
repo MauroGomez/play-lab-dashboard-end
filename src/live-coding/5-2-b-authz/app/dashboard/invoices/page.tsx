@@ -5,7 +5,7 @@ import { CreateInvoice } from '@/ui/invoices/buttons';
 import { lusitana } from '@/ui/fonts';
 import { InvoicesTableSkeleton } from '@/ui/skeletons';
 import { Suspense } from 'react';
-import { getInvoicesPagesData } from '@/model/data';
+import { getInvoicesPages } from '@/model/data';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { can } from '@/lib/authorization';
@@ -26,7 +26,7 @@ export default async function Page(props: {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await getInvoicesPagesData(query);
+  const totalPages = await getInvoicesPages(query);
   const canCreate = await can('invoices:create');
 
   return (

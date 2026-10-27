@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { deleteMovieData, getMovieData, updateMovieData, type MovieInput } from '@/model/data';
+import { deleteMovie, getMovie, updateMovie, type MovieInput } from '@/model/data';
 
 type RouteContext = {
   params: Promise<{
@@ -11,7 +11,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
 
   try {
-    const movie = await getMovieData(id);
+    const movie = await getMovie(id);
 
     if (!movie) {
       return NextResponse.json(
@@ -44,7 +44,7 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   try {
-    const movie = await updateMovieData(id, body);
+    const movie = await updateMovie(id, body);
 
     if (!movie) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { id } = await context.params;
 
   try {
-    const movieDeleted = await deleteMovieData(id);
+    const movieDeleted = await deleteMovie(id);
 
     if (!movieDeleted) {
       return NextResponse.json(

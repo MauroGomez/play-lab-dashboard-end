@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createMovieData, getMoviesData, type MovieInput } from '@/model/data';
+import { createMovie, getMovies, type MovieInput } from '@/model/data';
 
 export async function GET() {
   try {
-    const movies = await getMoviesData();
+    const movies = await getMovies();
 
     return NextResponse.json(movies);
   } catch (error) {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const movie = await createMovieData(body);
+    const movie = await createMovie(body);
 
     return NextResponse.json(movie, { status: 201 });
   } catch (error) {

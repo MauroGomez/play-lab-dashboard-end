@@ -3,7 +3,7 @@ import { UpdateMovie } from '@/ui/movies/buttons';
 import DeleteMovie from '@/ui/movies/delete-button';
 import MovieStatus from '@/ui/movies/status';
 import styles from './table.module.css';
-import { getFilteredMoviesData } from '@/model/data';
+import { getFilteredMovies } from '@/model/data';
 
 export default async function MoviesTable({
   query,
@@ -13,7 +13,7 @@ export default async function MoviesTable({
   currentPage: number;
 }) {
 
-  const movies = await getFilteredMoviesData(query, currentPage);
+  const movies = await getFilteredMovies(query, currentPage);
 
   return (
     <div className={styles.root}>

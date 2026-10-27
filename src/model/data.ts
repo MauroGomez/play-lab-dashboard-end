@@ -14,7 +14,7 @@ import { formatCurrency } from '@/lib/utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function getRevenueData() {
+export async function getRevenue() {
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
@@ -33,7 +33,7 @@ export async function getRevenueData() {
   }
 }
 
-export async function getLatestInvoicesData() {
+export async function getLatestInvoices() {
   try {
     const data = await sql<LatestInvoiceRaw[]>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -53,7 +53,7 @@ export async function getLatestInvoicesData() {
   }
 }
 
-export async function getCardDataData() {
+export async function getCardData() {
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
@@ -89,7 +89,7 @@ export async function getCardDataData() {
 }
 
 const ITEMS_PER_PAGE = 6;
-export async function getFilteredInvoicesData(
+export async function getFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
@@ -131,7 +131,7 @@ export async function getFilteredInvoicesData(
   }
 }
 
-export async function getInvoicesPagesData(query: string) {
+export async function getInvoicesPages(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
@@ -156,7 +156,7 @@ export async function getInvoicesPagesData(query: string) {
   }
 }
 
-export async function getInvoiceData(id: string) {
+export async function getInvoice(id: string) {
   try {
     const data = await sql<InvoiceForm[]>`
       SELECT
@@ -176,7 +176,7 @@ export async function getInvoiceData(id: string) {
   }
 }
 
-export async function getCustomerSummariesData() {
+export async function getCustomerSummaries() {
   try {
     const customers = await sql<CustomerField[]>`
       SELECT
@@ -193,7 +193,7 @@ export async function getCustomerSummariesData() {
   }
 }
 
-export async function getFilteredCustomersData(query: string) {
+export async function getFilteredCustomers(query: string) {
   try {
     const data = await sql<CustomersTableType[]>`
       SELECT
@@ -226,7 +226,7 @@ export async function getFilteredCustomersData(query: string) {
   }
 }
 
-export async function getFilteredMoviesData(query: string = "", currentPage: number = 1) {
+export async function getFilteredMovies(query: string = "", currentPage: number = 1) {
   // console.log('Fetching filtered movies with query:', query, 'and currentPage:', currentPage, new Date().toISOString());
   // await new Promise((resolve) => setTimeout(resolve, 4000)); // Simulate a 2-second delay
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -263,7 +263,7 @@ export async function getFilteredMoviesData(query: string = "", currentPage: num
   }
 }
 
-export async function getMovieSummariesData() {
+export async function getMovieSummaries() {
   try {
     const movies = await sql<MovieField[]>`
       SELECT
@@ -282,7 +282,7 @@ export async function getMovieSummariesData() {
   }
 }
 
-export async function getMoviesPagesDataUncached(query: string) {
+export async function getMoviesPagesUncached(query: string) {
   try {
     const data = await sql`
       SELECT COUNT(*)
@@ -303,15 +303,15 @@ export async function getMoviesPagesDataUncached(query: string) {
   }
 }
 
-export const getMoviesPagesData = unstable_cache(
-  getMoviesPagesDataUncached,
+export const getMoviesPages = unstable_cache(
+  getMoviesPagesUncached,
   ['movies-pages'],
   { revalidate: 300 },
 );
 
-// export const getMoviesPagesData = getMoviesPagesDataUncached;
+// export const getMoviesPages = getMoviesPagesUncached;
 
-export async function getMoviesData() {
+export async function getMovies() {
   const movies = await sql<Movie[]>`
     SELECT
       id,
@@ -331,7 +331,7 @@ export async function getMoviesData() {
   return movies;
 }
 
-export async function getMovieData(id: string) {
+export async function getMovie(id: string) {
   try {
     const data = await sql<Movie[]>`
       SELECT
@@ -368,7 +368,7 @@ export type MovieInput = {
   status: 'available' | 'draft' | 'archived';
 };
 
-export async function createMovieData(movie: MovieInput) {
+export async function createMovie(movie: MovieInput) {
   const movies = await sql<Movie[]>`
     INSERT INTO movies (
       title,
@@ -408,7 +408,7 @@ export async function createMovieData(movie: MovieInput) {
   return movies[0];
 }
 
-export async function updateMovieData(id: string, movie: MovieInput) {
+export async function updateMovie(id: string, movie: MovieInput) {
   const movies = await sql<Movie[]>`
     UPDATE movies
     SET
@@ -438,7 +438,7 @@ export async function updateMovieData(id: string, movie: MovieInput) {
   return movies[0];
 }
 
-export async function deleteMovieData(id: string) {
+export async function deleteMovie(id: string) {
   const movies = await sql<{ id: string }[]>`
     DELETE FROM movies
     WHERE id = ${id}

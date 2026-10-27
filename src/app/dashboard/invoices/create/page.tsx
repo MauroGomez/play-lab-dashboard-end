@@ -1,4 +1,4 @@
-import { getCustomerSummariesData, getMovieSummariesData } from '@/model/data';
+import { getCustomerSummaries, getMovieSummaries } from '@/model/data';
 import Form from '@/ui/invoices/create-form';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import { Metadata } from 'next';
@@ -13,8 +13,8 @@ export default async function Page() {
   if (!(await can('invoices:create'))) redirect('/dashboard');
 
   const [customers, movies] = await Promise.all([
-    getCustomerSummariesData(),
-    getMovieSummariesData(),
+    getCustomerSummaries(),
+    getMovieSummaries(),
   ]);
 
   return (

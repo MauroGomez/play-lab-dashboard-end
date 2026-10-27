@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createMovieData } from '@/model/data';
+import * as model from '@/model/data';
 import {
   type MovieFormErrors,
   validateMovie,
@@ -28,7 +28,7 @@ export async function createMovie(
   }
 
   try {
-    await createMovieData(validationResult.data);
+    await model.createMovie(validationResult.data);
   } catch (error) {
     return {
       success: false,

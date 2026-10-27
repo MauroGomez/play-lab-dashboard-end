@@ -1,4 +1,4 @@
-import { getMovieData } from '@/model/data';
+import { getMovie } from '@/model/data';
 import Breadcrumbs from '@/ui/breadcrumbs';
 import Form from '@/ui/movies/edit-form';
 import { Metadata } from 'next';
@@ -13,7 +13,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   if (!(await can('movies:update'))) redirect('/dashboard');
 
   const params = await props.params;
-  const movie = await getMovieData(params.id);
+  const movie = await getMovie(params.id);
 
   if (!movie) {
     notFound();

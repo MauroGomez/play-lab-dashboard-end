@@ -4,7 +4,7 @@ Demostración de una inyección SQL de tipo **UNION-based** sobre el buscador de
 películas, para leer datos de la tabla `users` (emails y hashes de contraseñas).
 
 > ⚠️ El archivo [`model/data.ts`](./model/data.ts) contiene una versión
-> **deliberadamente vulnerable** de `getFilteredMoviesData`. Es solo para el
+> **deliberadamente vulnerable** de `getFilteredMovies`. Es solo para el
 > laboratorio: **nunca** se construye SQL concatenando input del usuario en
 > producción.
 

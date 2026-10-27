@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { UpdateInvoice, DeleteInvoice } from '@/ui/invoices/buttons';
 import InvoiceStatus from '@/ui/invoices/status';
 import { formatDateToLocal, formatCurrency } from '@/lib/utils';
-import { getFilteredInvoicesData } from '@/model/data';
+import { getFilteredInvoices } from '@/model/data';
 import { can } from '@/lib/authorization';
 
 export default async function InvoicesTable({
@@ -14,7 +14,7 @@ export default async function InvoicesTable({
 }) {
   const canUpdate = await can('invoices:update');
   const canDelete = await can('invoices:delete');
-  const invoices = await getFilteredInvoicesData(query, currentPage);
+  const invoices = await getFilteredInvoices(query, currentPage);
 
   return (
     <div className="mt-6 flow-root">

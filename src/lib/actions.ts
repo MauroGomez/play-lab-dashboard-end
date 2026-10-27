@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { MovieFormErrors, validateMovie } from '@/model/validation';
-import { createMovieData, deleteMovieData, updateMovieData } from '@/model/data';
+import * as model from '@/model/data';
 import { can } from '@/lib/authorization';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -187,7 +187,7 @@ export async function createMovie(
   }
 
   try {
-    await createMovieData(validationResult.data);
+    await model.createMovie(validationResult.data);
   } catch (error) {
     return {
       success: false,
@@ -233,7 +233,7 @@ export async function updateMovie(
   }
 
   try {
-    await updateMovieData(id, validationResult.data);
+    await model.updateMovie(id, validationResult.data);
   } catch (error) {
     return {
       success: false,
@@ -250,7 +250,7 @@ export async function deleteMovie(id: string) {
   if (!(await can('movies:delete'))) {
     throw new Error('Unauthorized: you cannot delete movies.');
   }
-  await deleteMovieData(id);
+  await model.deleteMovie(id);
   revalidatePath('/dashboard/movies');
 }
 

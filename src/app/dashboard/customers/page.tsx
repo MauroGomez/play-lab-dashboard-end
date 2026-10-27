@@ -1,4 +1,4 @@
-import { getFilteredCustomersData } from '@/model/data';
+import { getFilteredCustomers } from '@/model/data';
 import CustomersTable from '@/ui/customers/table';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -19,7 +19,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
 
-  const customers = await getFilteredCustomersData(query);
+  const customers = await getFilteredCustomers(query);
 
   return (
     <main>
