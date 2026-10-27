@@ -232,11 +232,9 @@ export default function CreateMovieForm() {
           </div>
         </div>
 
-        <div aria-live="polite" aria-atomic="true">
-          {errorMessage ? (
-            <p className={styles.error}>{errorMessage}</p>
-          ) : null}
-        </div>
+        {errorMessage ? (
+          <p className={styles.error}>{errorMessage}</p>
+        ) : null}
         {isCreating && (
           <div className={styles.loadingOverlay}>
             <span className={styles.spinner}/>            

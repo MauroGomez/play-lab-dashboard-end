@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { MovieFormErrors, validateMovie } from '@/model/validation';
-import { createMovieData, deleteMovieData } from '@/model/data';
+import { createMovieData, deleteMovieData, updateMovieData } from '@/model/data';
 import { can } from '@/lib/authorization';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -28,54 +28,11 @@ const FormSchema = z.object({
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ date: true, id: true });
 
-const MovieFormSchema = z.object({
-  id: z.string(),
-  title: z.string().min(1, { message: 'Please enter a title.' }),
-  director: z.string().min(1, { message: 'Please enter a director.' }),
-  genre: z.string().min(1, { message: 'Please enter a genre.' }),
-  releaseYear: z.coerce
-    .number()
-    .int()
-    .min(1888, { message: 'Please enter a valid release year.' }),
-  rating: z.string().min(1, { message: 'Please enter a rating.' }),
-  durationMinutes: z.coerce
-    .number()
-    .int()
-    .gt(0, { message: 'Please enter a duration greater than 0.' }),
-  purchasePrice: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter a purchase price greater than $0.' }),
-  rentalPrice: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter a rental price greater than $0.' }),
-  status: z.enum(['available', 'draft', 'archived'], {
-    invalid_type_error: 'Please select a movie status.',
-  }),
-});
-
-const CreateMovie = MovieFormSchema.omit({ id: true });
-const UpdateMovie = MovieFormSchema.omit({ id: true });
-
 export type State = {
   errors?: {
     customerId?: string[];
     movieId?: string[];
     type?: string[];
-    status?: string[];
-  };
-  message?: string | null;
-};
-
-export type MovieState = {
-  errors?: {
-    title?: string[];
-    director?: string[];
-    genre?: string[];
-    releaseYear?: string[];
-    rating?: string[];
-    durationMinutes?: string[];
-    purchasePrice?: string[];
-    rentalPrice?: string[];
     status?: string[];
   };
   message?: string | null;
@@ -251,70 +208,42 @@ export async function createMovie(
   };
 }
 
+type UpdateMovieState = CreateMovieState;
+
 export async function updateMovie(
   id: string,
-  prevState: MovieState,
-  formData: FormData,
-) {
+  movieData: unknown,
+): Promise<UpdateMovieState> {
   if (!(await can('movies:update'))) {
-    return { message: 'Unauthorized: you cannot update movies.' };
-  }
-
-  const validatedFields = UpdateMovie.safeParse({
-    title: formData.get('title'),
-    director: formData.get('director'),
-    genre: formData.get('genre'),
-    releaseYear: formData.get('releaseYear'),
-    rating: formData.get('rating'),
-    durationMinutes: formData.get('durationMinutes'),
-    purchasePrice: formData.get('purchasePrice'),
-    rentalPrice: formData.get('rentalPrice'),
-    status: formData.get('status'),
-  });
-
-  if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Update Movie.',
+      success: false,
+      errors: {},
+      message: 'Unauthorized: you cannot update movies.',
     };
   }
 
-  const {
-    title,
-    director,
-    genre,
-    releaseYear,
-    rating,
-    durationMinutes,
-    purchasePrice,
-    rentalPrice,
-    status,
-  } = validatedFields.data;
+  const validationResult = validateMovie(movieData);
 
-  const purchasePriceInCents = purchasePrice * 100;
-  const rentalPriceInCents = rentalPrice * 100;
+  if (!validationResult.success) {
+    return {
+      success: false,
+      errors: validationResult.fieldErrors,
+      message: validationResult.message,
+    };
+  }
 
   try {
-    await sql`
-      UPDATE movies
-      SET
-        title = ${title},
-        director = ${director},
-        genre = ${genre},
-        release_year = ${releaseYear},
-        rating = ${rating},
-        duration_minutes = ${durationMinutes},
-        purchase_price = ${purchasePriceInCents},
-        rental_price = ${rentalPriceInCents},
-        status = ${status}
-      WHERE id = ${id}
-    `;
+    await updateMovieData(id, validationResult.data);
   } catch (error) {
-    return { message: 'Database Error: Failed to Update Movie.' };
+    return {
+      success: false,
+      errors: {},
+      message: 'Failed to update movie.',
+    };
   }
 
   revalidatePath('/dashboard/movies');
-  redirect('/dashboard/movies');
+  return { success: true, errors: {}, message: null };
 }
 
 export async function deleteMovie(id: string) {

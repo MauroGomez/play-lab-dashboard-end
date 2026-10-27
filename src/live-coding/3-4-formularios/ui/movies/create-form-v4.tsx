@@ -224,11 +224,9 @@ export default function CreateMovieForm() {
           </div>
         </div>
 
-        <div aria-live="polite" aria-atomic="true">
-          {errorMessage ? (
-            <p className={styles.error}>{errorMessage}</p>
-          ) : null}
-        </div>
+        {errorMessage ? (
+          <p className={styles.error}>{errorMessage}</p>
+        ) : null}
       </fieldset>
       <div className={styles.actions}>
         <Link href="/dashboard/movies" className={styles.cancelButton}>

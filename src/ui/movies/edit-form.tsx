@@ -1,6 +1,7 @@
 'use client';
 
-import { updateMovie, type MovieState } from '@/lib/actions';
+import { updateMovie } from '@/lib/actions';
+import { validateMovie, type MovieFormErrors } from '@/model/validation';
 import type { Movie } from '@/model/definitions';
 import { Button } from '@/ui/button';
 import {
@@ -11,21 +12,67 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
-import { useActionState } from 'react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import styles from '@/ui/movies/create-form.module.css';
 
 export default function EditMovieForm({ movie }: { movie: Movie }) {
   const router = useRouter();
-  const initialState: MovieState = { message: null, errors: {} };
-  const updateMovieWithId = updateMovie.bind(null, movie.id);
-  const [state, formAction, isPending] = useActionState(
-    updateMovieWithId,
-    initialState,
-  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<MovieFormErrors>({});
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isUpdating) return;
+
+    const formData = new FormData(e.currentTarget);
+    const movieData = {
+      title: formData.get('title'),
+      director: formData.get('director'),
+      genre: formData.get('genre'),
+      release_year: Number(formData.get('release_year')),
+      rating: formData.get('rating'),
+      duration_minutes: Number(formData.get('duration_minutes')),
+      purchase_price: Math.round(Number(formData.get('purchase_price')) * 100),
+      rental_price: Math.round(Number(formData.get('rental_price')) * 100),
+      status: formData.get('status')  // Returns null when no option is selected
+    };
+    const validationResult = validateMovie(movieData);
+
+    if (!validationResult.success) {
+      setFieldErrors(validationResult.fieldErrors);
+      setErrorMessage(validationResult.message);
+      return;
+    }
+
+    setFieldErrors({});
+    setErrorMessage(null);
+
+    setIsUpdating(true);
+    try {
+      const result = await updateMovie(movie.id, movieData);
+
+      if (!result.success) {
+        setFieldErrors(result.errors ?? {});
+        setErrorMessage(result.message ?? 'Failed to save movie.');
+      } else {
+        setTimeout(() => {
+          toast.success('Movie updated successfully!');
+        }, 500);
+        router.push('/dashboard/movies');
+        router.refresh();
+      }
+    } finally {
+      setIsUpdating(false);
+    }
+
+  }
 
   return (
-    <form action={formAction} aria-busy={isPending}>
-      <fieldset className={styles.container} disabled={isPending}>
+    <form onSubmit={handleSubmit} aria-busy={isUpdating}>
+      <fieldset className={styles.container} disabled={isUpdating}>
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
             Title
@@ -38,11 +85,12 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
               type="text"
               placeholder="Enter movie title"
               className={styles.input}
+              aria-invalid={fieldErrors.title ? 'true' : 'false'}
               aria-describedby="title-error"
             />
             <FilmIcon className={styles.icon} />
           </div>
-          <FieldErrors id="title-error" errors={state.errors?.title} />
+          <FieldErrors id="title-error" errors={fieldErrors.title} />
         </div>
 
         <div className={styles.field}>
@@ -57,11 +105,12 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
               type="text"
               placeholder="Enter director"
               className={styles.input}
+              aria-invalid={fieldErrors.director ? 'true' : 'false'}
               aria-describedby="director-error"
             />
             <UserIcon className={styles.icon} />
           </div>
-          <FieldErrors id="director-error" errors={state.errors?.director} />
+          <FieldErrors id="director-error" errors={fieldErrors.director} />
         </div>
 
         <div className={styles.gridTwoColumns}>
@@ -77,11 +126,12 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
                 type="text"
                 placeholder="Drama, action, comedy..."
                 className={styles.input}
+                aria-invalid={fieldErrors.genre ? 'true' : 'false'}
                 aria-describedby="genre-error"
               />
               <TagIcon className={styles.icon} />
             </div>
-            <FieldErrors id="genre-error" errors={state.errors?.genre} />
+            <FieldErrors id="genre-error" errors={fieldErrors.genre} />
           </div>
 
           <div className={styles.field}>
@@ -96,11 +146,12 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
                 type="text"
                 placeholder="PG-13"
                 className={styles.input}
+                aria-invalid={fieldErrors.rating ? 'true' : 'false'}
                 aria-describedby="rating-error"
               />
               <TagIcon className={styles.icon} />
             </div>
-            <FieldErrors id="rating-error" errors={state.errors?.rating} />
+            <FieldErrors id="rating-error" errors={fieldErrors.rating} />
           </div>
         </div>
 
@@ -112,16 +163,17 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
             <div className={styles.inputWrapper}>
               <input
                 id="release-year"
-                name="releaseYear"
+                name="release_year"
                 defaultValue={movie.release_year}
                 type="number"
                 placeholder="2024"
                 className={styles.input}
+                aria-invalid={fieldErrors.release_year ? 'true' : 'false'}
                 aria-describedby="release-year-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
-            <FieldErrors id="release-year-error" errors={state.errors?.releaseYear} />
+            <FieldErrors id="release-year-error" errors={fieldErrors.release_year} />
           </div>
 
           <div className={styles.field}>
@@ -131,16 +183,17 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
             <div className={styles.inputWrapper}>
               <input
                 id="duration-minutes"
-                name="durationMinutes"
+                name="duration_minutes"
                 defaultValue={movie.duration_minutes}
                 type="number"
                 placeholder="120"
                 className={styles.input}
+                aria-invalid={fieldErrors.duration_minutes ? 'true' : 'false'}
                 aria-describedby="duration-minutes-error"
               />
               <ClockIcon className={styles.icon} />
             </div>
-            <FieldErrors id="duration-minutes-error" errors={state.errors?.durationMinutes} />
+            <FieldErrors id="duration-minutes-error" errors={fieldErrors.duration_minutes} />
           </div>
 
           <div className={styles.field}>
@@ -150,17 +203,18 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
             <div className={styles.inputWrapper}>
               <input
                 id="purchase-price"
-                name="purchasePrice"
+                name="purchase_price"
                 defaultValue={movie.purchase_price / 100}
                 type="number"
                 step="0.01"
                 placeholder="12.99"
                 className={styles.input}
+                aria-invalid={fieldErrors.purchase_price ? 'true' : 'false'}
                 aria-describedby="purchase-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
-            <FieldErrors id="purchase-price-error" errors={state.errors?.purchasePrice} />
+            <FieldErrors id="purchase-price-error" errors={fieldErrors.purchase_price} />
           </div>
         </div>
 
@@ -172,17 +226,18 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
             <div className={styles.inputWrapper}>
               <input
                 id="rental-price"
-                name="rentalPrice"
+                name="rental_price"
                 defaultValue={movie.rental_price / 100}
                 type="number"
                 step="0.01"
                 placeholder="4.99"
                 className={styles.input}
+                aria-invalid={fieldErrors.rental_price ? 'true' : 'false'}
                 aria-describedby="rental-price-error"
               />
               <BanknotesIcon className={styles.icon} />
             </div>
-            <FieldErrors id="rental-price-error" errors={state.errors?.rentalPrice} />
+            <FieldErrors id="rental-price-error" errors={fieldErrors.rental_price} />
           </div>
 
           <div className={styles.field}>
@@ -193,6 +248,7 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
               id="status"
               name="status"
               className={styles.select}
+              aria-invalid={fieldErrors.status ? 'true' : 'false'}
               aria-describedby="status-error"
               defaultValue={movie.status}
             >
@@ -203,32 +259,34 @@ export default function EditMovieForm({ movie }: { movie: Movie }) {
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
-            <FieldErrors id="status-error" errors={state.errors?.status} />
+            <FieldErrors id="status-error" errors={fieldErrors.status} />
           </div>
         </div>
 
         <div aria-live="polite" aria-atomic="true">
-          {state.message ? (
-            <p className={styles.error}>{state.message}</p>
+          {errorMessage ? (
+            <p className={styles.error}>{errorMessage}</p>
           ) : null}
         </div>
-        {isPending && (
-          <div className={styles.loadingOverlay} role="status">
-            <span className={styles.spinner} aria-hidden="true" />
-            <span className="sr-only">Saving movie...</span>
-          </div>
-        )}
+        <div role="status">
+          {isUpdating && (
+            <div className={styles.loadingOverlay}>
+              <span className={styles.spinner} aria-hidden="true" />
+              <span className={styles.srOnly}>Saving movie...</span>
+            </div>
+          )}
+        </div>
       </fieldset>
       <div className={styles.actions}>
         <button
           type="button"
           className={styles.cancelButton}
-          disabled={isPending}
+          disabled={isUpdating}
           onClick={() => router.push('/dashboard/movies')}
         >
           Cancel
         </button>
-        <Button type="submit" disabled={isPending} aria-disabled={isPending}>
+        <Button type="submit" disabled={isUpdating}>
           Edit Movie
         </Button>
       </div>
