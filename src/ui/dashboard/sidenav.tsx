@@ -11,7 +11,6 @@ export default async function SideNav() {
   const canReadInvoices = await can('invoices:read');
   const canReadMovies = await can('movies:read');
   const canReadCustomers = await can('customers:read');
-  // `name` is kept by NextAuth by default; `role` is copied in the jwt/session callbacks
   const user = (await auth())?.user;
 
   return (

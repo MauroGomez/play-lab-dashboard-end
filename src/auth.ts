@@ -71,9 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     // Used by the proxy (src/proxy.ts) on every request
     authorized({ auth, request: { nextUrl } }) {
-      // const isLoggedIn = !!auth?.user;
-      console.log("auth:", auth);
-      const isLoggedIn = !!auth;
+      const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
       if (isOnDashboard) {
         if (isLoggedIn) return true;

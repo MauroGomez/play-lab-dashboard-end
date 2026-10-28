@@ -22,49 +22,54 @@ export default function NavLinks({
 }) {
   const pathname = usePathname();
 
-  // Map of links to display in the side navigation.
-  // Depending on the size of the application, this would be stored in a database.
-  const links = [
-    { name: 'Home', href: '/dashboard', icon: HomeIcon, visible: true },
-    {
-      name: 'Invoices',
-      href: '/dashboard/invoices',
-      icon: DocumentDuplicateIcon,
-      visible: canReadInvoices,
-    },
-    {
-      name: 'Movies',
-      href: '/dashboard/movies',
-      icon: FilmIcon,
-      visible: canReadMovies,
-    },
-    {
-      name: 'Customers',
-      href: '/dashboard/customers',
-      icon: UserGroupIcon,
-      visible: canReadCustomers,
-    },
-  ];
-  const visibleLinks = links.filter((link) => link.visible);
-
   return (
     <>
-      {visibleLinks.map((link) => {
-        const LinkIcon = link.icon;
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={clsx(
-              styles.link,
-              pathname === link.href && styles.active              
-            )}
-          >
-            <LinkIcon className={styles.icon} />
-            <p className={styles.label}>{link.name}</p>
-          </Link>
-        );
-      })}
+      <Link
+        href="/dashboard"
+        className={clsx(styles.link, pathname === '/dashboard' && styles.active)}
+      >
+        <HomeIcon className={styles.icon} />
+        <p className={styles.label}>Home</p>
+      </Link>
+
+      {canReadInvoices && (
+        <Link
+          href="/dashboard/invoices"
+          className={clsx(
+            styles.link,
+            pathname === '/dashboard/invoices' && styles.active,
+          )}
+        >
+          <DocumentDuplicateIcon className={styles.icon} />
+          <p className={styles.label}>Invoices</p>
+        </Link>
+      )}
+
+      {canReadMovies && (
+        <Link
+          href="/dashboard/movies"
+          className={clsx(
+            styles.link,
+            pathname === '/dashboard/movies' && styles.active,
+          )}
+        >
+          <FilmIcon className={styles.icon} />
+          <p className={styles.label}>Movies</p>
+        </Link>
+      )}
+
+      {canReadCustomers && (
+        <Link
+          href="/dashboard/customers"
+          className={clsx(
+            styles.link,
+            pathname === '/dashboard/customers' && styles.active,
+          )}
+        >
+          <UserGroupIcon className={styles.icon} />
+          <p className={styles.label}>Customers</p>
+        </Link>
+      )}
     </>
   );
 }
