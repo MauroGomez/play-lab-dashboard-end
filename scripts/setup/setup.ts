@@ -1,14 +1,15 @@
 import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
-import { invoices, customers, movies, revenue, users } from '@/lib/placeholder-data';
+import { invoices, customers, movies, revenue, users } from './placeholder-data.ts';
+import { sql, getDatabaseName, getDatabaseOptions } from '../../src/lib/db.ts';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const ADMIN_DATABASE_NAME = 'neondb';
 
-async function ensureUuidExtension(sql: postgres.Sql) {
+async function ensureUuidExtension(sql: postgres.TransactionSql) {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 }
 
-async function seedUsers(sql: postgres.Sql) {
+async function seedUsers(sql: postgres.TransactionSql) {
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -35,7 +36,7 @@ async function seedUsers(sql: postgres.Sql) {
   return insertedUsers;
 }
 
-async function seedInvoices(sql: postgres.Sql) {
+async function seedInvoices(sql: postgres.TransactionSql) {
   await sql`
     CREATE TABLE IF NOT EXISTS invoices (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -72,7 +73,7 @@ async function seedInvoices(sql: postgres.Sql) {
   return insertedInvoices;
 }
 
-async function seedCustomers(sql: postgres.Sql) {
+async function seedCustomers(sql: postgres.TransactionSql) {
   await sql`
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -95,7 +96,7 @@ async function seedCustomers(sql: postgres.Sql) {
   return insertedCustomers;
 }
 
-async function seedMovies(sql: postgres.Sql) {
+async function seedMovies(sql: postgres.TransactionSql) {
   await sql`
     CREATE TABLE IF NOT EXISTS movies (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -156,7 +157,7 @@ async function seedMovies(sql: postgres.Sql) {
   return insertedMovies;
 }
 
-async function seedRevenue(sql: postgres.Sql) {
+async function seedRevenue(sql: postgres.TransactionSql) {
   await sql`
     CREATE TABLE IF NOT EXISTS revenue (
       month VARCHAR(4) NOT NULL UNIQUE,
@@ -177,19 +178,44 @@ async function seedRevenue(sql: postgres.Sql) {
   return insertedRevenue;
 }
 
-export async function GET() {
+async function setup() {
+  const databaseName = getDatabaseName();
+  const adminSql = postgres(getDatabaseOptions(ADMIN_DATABASE_NAME));
   try {
-    await sql.begin(async (sql) => {
-      await ensureUuidExtension(sql);
-      await seedUsers(sql);
-      await seedCustomers(sql);
-      await seedMovies(sql);
-      await seedInvoices(sql);
-      await seedRevenue(sql);
-    });
+    const [database] = await adminSql`
+      SELECT pg_get_userbyid(datdba) AS owner,
+             pg_get_userbyid(datdba) = current_user AS owned_by_current_user
+      FROM pg_database WHERE datname = ${databaseName}
+    `;
+    if (database && !database.owned_by_current_user) {
+      throw new Error(`La base ${databaseName} pertenece a ${database.owner}. Revisá el grupo configurado.`);
+    }
+    console.log(`Recreando ${databaseName}: se eliminarán todos sus datos.`);
+    await adminSql`DROP DATABASE IF EXISTS ${adminSql(databaseName)} WITH (FORCE)`;
+    await adminSql`CREATE DATABASE ${adminSql(databaseName)}`;
+    // El propietario conserva el acceso; los otros grupos no lo reciben por PUBLIC.
+    await adminSql`REVOKE CONNECT ON DATABASE ${adminSql(databaseName)} FROM PUBLIC`;
+  } finally {
+    await adminSql.end();
+  }
 
-    return Response.json({ message: 'Database seeded successfully' });
-  } catch (error) {
-    return Response.json({ error }, { status: 500 });
+  try {
+    await sql.begin(async (tx) => {
+      await ensureUuidExtension(tx);
+      await seedUsers(tx);
+      await seedCustomers(tx);
+      await seedMovies(tx);
+      await seedInvoices(tx);
+      await seedRevenue(tx);
+    });
+    console.log(`Base ${databaseName} creada y datos iniciales cargados.`);
+  } finally {
+    await sql.end();
   }
 }
+
+setup().catch((error: unknown) => {
+  // No imprimir objetos del driver que puedan incluir credenciales.
+  console.error(error instanceof Error ? error.message : 'Error al preparar la base de datos.');
+  process.exitCode = 1;
+});

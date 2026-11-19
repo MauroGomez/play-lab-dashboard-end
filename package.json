@@ -3,7 +3,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "db:setup": "node --env-file=.env scripts/setup/setup.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -33,5 +34,8 @@
     "onlyBuiltDependencies": [
       "sharp"
     ]
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }
