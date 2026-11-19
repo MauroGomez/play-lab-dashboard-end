@@ -15,7 +15,7 @@ export default async function SideNav() {
         </div>
       </Link>
       <div className={styles.nav}>
-        <NavLinks canReadCustomers={true} canReadInvoices={true} canReadMovies={true} />
+        <NavLinks canReadUsers={true} canReadTransactions={true} canReadMovies={true} />
         <div className={styles.spacer}></div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 // This file contains placeholder data that you'll be replacing with real data in the Data Fetching chapter:
 // https://nextjs.org/learn/dashboard-app/fetching-data
-const users = [
+const staffUsers = [
   {
     id: '410544b2-4001-4271-9855-fec4b6a6442a',
     name: 'Alicia',
@@ -24,42 +24,42 @@ const users = [
   }
 ];
 
-const customers = [
+const users = [
   {
     id: 'd6e15727-9fe1-4961-8c5b-ea44a9bd81aa',
     name: 'Evil Rabbit',
     email: 'evil@rabbit.com',
-    image_url: '/customers/evil-rabbit.png',
+    image_url: '/users/evil-rabbit.png',
   },
   {
     id: '3958dc9e-712f-4377-85e9-fec4b6a6442a',
     name: 'Delba de Oliveira',
     email: 'delba@oliveira.com',
-    image_url: '/customers/delba-de-oliveira.png',
+    image_url: '/users/delba-de-oliveira.png',
   },
   {
     id: '3958dc9e-742f-4377-85e9-fec4b6a6442a',
     name: 'Lee Robinson',
     email: 'lee@robinson.com',
-    image_url: '/customers/lee-robinson.png',
+    image_url: '/users/lee-robinson.png',
   },
   {
     id: '76d65c26-f784-44a2-ac19-586678f7c2f2',
     name: 'Michael Novotny',
     email: 'michael@novotny.com',
-    image_url: '/customers/michael-novotny.png',
+    image_url: '/users/michael-novotny.png',
   },
   {
     id: 'CC27C14A-0ACF-4F4A-A6C9-D45682C144B9',
     name: 'Amy Burns',
     email: 'amy@burns.com',
-    image_url: '/customers/amy-burns.png',
+    image_url: '/users/amy-burns.png',
   },
   {
     id: '13D07535-C59E-4157-A011-F8D2EF4E0CBB',
     name: 'Balazs Orban',
     email: 'balazs@orban.com',
-    image_url: '/customers/balazs-orban.png',
+    image_url: '/users/balazs-orban.png',
   },
 ];
 
@@ -150,10 +150,10 @@ const movies = [
   },
 ];
 
-const invoices = [
+const transactions = [
   {
     id: '6f6a3d9b-df84-4c03-9a62-0f9c785f8e20',
-    customer_id: customers[0].id,
+    user_id: users[0].id,
     movie_id: movies[0].id,
     type: 'purchase',
     amount: movies[0].purchase_price,
@@ -162,7 +162,7 @@ const invoices = [
   },
   {
     id: '9adf9ca6-32a8-4635-8c3d-32e4f77f59cb',
-    customer_id: customers[1].id,
+    user_id: users[1].id,
     movie_id: movies[1].id,
     type: 'rental',
     amount: movies[1].rental_price,
@@ -171,7 +171,7 @@ const invoices = [
   },
   {
     id: 'ec331b2d-c914-44a3-8cc5-50610655a3cc',
-    customer_id: customers[3].id,
+    user_id: users[3].id,
     movie_id: movies[2].id,
     type: 'purchase',
     amount: movies[2].purchase_price,
@@ -180,7 +180,7 @@ const invoices = [
   },
   {
     id: 'dc032f2e-337d-4f0d-97d1-fc440384d0dd',
-    customer_id: customers[3].id,
+    user_id: users[3].id,
     movie_id: movies[3].id,
     type: 'rental',
     amount: movies[3].rental_price,
@@ -189,7 +189,7 @@ const invoices = [
   },
   {
     id: 'a5a9ac69-d5a3-4701-978d-c82f8f215d98',
-    customer_id: customers[5].id,
+    user_id: users[5].id,
     movie_id: movies[4].id,
     type: 'purchase',
     amount: movies[4].purchase_price,
@@ -198,7 +198,7 @@ const invoices = [
   },
   {
     id: '79cb9fc5-5617-4c31-86c5-95edba3f6125',
-    customer_id: customers[2].id,
+    user_id: users[2].id,
     movie_id: movies[5].id,
     type: 'rental',
     amount: movies[5].rental_price,
@@ -207,7 +207,7 @@ const invoices = [
   },
   {
     id: '121a1d60-d5ff-491a-9756-2e24341ee91e',
-    customer_id: customers[0].id,
+    user_id: users[0].id,
     movie_id: movies[6].id,
     type: 'purchase',
     amount: movies[6].purchase_price,
@@ -216,7 +216,7 @@ const invoices = [
   },
   {
     id: '9dfb6d02-bf03-47da-9746-ec22b1f828c4',
-    customer_id: customers[4].id,
+    user_id: users[4].id,
     movie_id: movies[0].id,
     type: 'rental',
     amount: movies[0].rental_price,
@@ -225,7 +225,7 @@ const invoices = [
   },
   {
     id: '71e9e3a3-29fb-4b01-9e12-943170e2f716',
-    customer_id: customers[5].id,
+    user_id: users[5].id,
     movie_id: movies[1].id,
     type: 'purchase',
     amount: movies[1].purchase_price,
@@ -234,7 +234,7 @@ const invoices = [
   },
   {
     id: 'b0f36a61-ef2e-45b4-b37d-526fdb60eb60',
-    customer_id: customers[1].id,
+    user_id: users[1].id,
     movie_id: movies[2].id,
     type: 'rental',
     amount: movies[2].rental_price,
@@ -243,7 +243,7 @@ const invoices = [
   },
   {
     id: '650e1018-82e5-4ad7-a396-d47c49ef4f42',
-    customer_id: customers[5].id,
+    user_id: users[5].id,
     movie_id: movies[5].id,
     type: 'purchase',
     amount: movies[5].purchase_price,
@@ -252,7 +252,7 @@ const invoices = [
   },
   {
     id: 'af8ed1e4-96fc-4cda-9799-a136f64a0b92',
-    customer_id: customers[2].id,
+    user_id: users[2].id,
     movie_id: movies[6].id,
     type: 'rental',
     amount: movies[6].rental_price,
@@ -276,4 +276,4 @@ const revenue = [
   { month: 'Dec', revenue: 4800 },
 ];
 
-export { users, customers, invoices, movies, revenue };
+export { staffUsers, users, transactions, movies, revenue };

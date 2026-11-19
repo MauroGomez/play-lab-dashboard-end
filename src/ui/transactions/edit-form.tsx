@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomerField, InvoiceForm, MovieField } from '@/model/definitions';
+import { UserField, TransactionForm, MovieField } from '@/model/definitions';
 import {
   CheckIcon,
   ClockIcon,
@@ -10,53 +10,53 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/ui/button';
-import { updateInvoice, State } from '@/lib/actions';
+import { updateTransaction, State } from '@/lib/actions';
 import { useActionState } from 'react';
 
-export default function EditInvoiceForm({
-  invoice,
-  customers,
+export default function EditTransactionForm({
+  transaction,
+  users,
   movies,
 }: {
-  invoice: InvoiceForm;
-  customers: CustomerField[];
+  transaction: TransactionForm;
+  users: UserField[];
   movies: MovieField[];
 }) {
   const initialState: State = { message: null, errors: {} };
-  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
-  const [state, formAction] = useActionState(updateInvoiceWithId, initialState);
+  const updateTransactionWithId = updateTransaction.bind(null, transaction.id);
+  const [state, formAction] = useActionState(updateTransactionWithId, initialState);
 
   return (
     <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* User Name */}
         <div className="mb-4">
-          <label htmlFor="customer" className="mb-2 block text-sm font-medium">
-            Choose customer
+          <label htmlFor="user" className="mb-2 block text-sm font-medium">
+            Choose user
           </label>
           <div className="relative">
             <select
-              id="customer"
-              name="customerId"
+              id="user"
+              name="userId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue={invoice.customer_id}
-              aria-describedby="customer-error"
+              defaultValue={transaction.user_id}
+              aria-describedby="user-error"
             >
               <option value="" disabled>
-                Select a customer
+                Select a user
               </option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
                 </option>
               ))}
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
-          <div id="customer-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.customerId &&
-              state.errors.customerId.map((error: string) => (
+          <div id="user-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.userId &&
+              state.errors.userId.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
@@ -74,7 +74,7 @@ export default function EditInvoiceForm({
               id="movie"
               name="movieId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue={invoice.movie_id}
+              defaultValue={transaction.movie_id}
               aria-describedby="movie-error"
             >
               <option value="" disabled>
@@ -99,7 +99,7 @@ export default function EditInvoiceForm({
           </div>
         </div>
 
-        {/* Invoice Type */}
+        {/* Transaction Type */}
         <fieldset className="mb-4">
           <legend className="mb-2 block text-sm font-medium">
             Set the operation type
@@ -112,7 +112,7 @@ export default function EditInvoiceForm({
                   name="type"
                   type="radio"
                   value="rental"
-                  defaultChecked={invoice.type === 'rental'}
+                  defaultChecked={transaction.type === 'rental'}
                   className="h-4 w-4 border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -128,7 +128,7 @@ export default function EditInvoiceForm({
                   name="type"
                   type="radio"
                   value="purchase"
-                  defaultChecked={invoice.type === 'purchase'}
+                  defaultChecked={transaction.type === 'purchase'}
                   className="h-4 w-4 border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -150,10 +150,10 @@ export default function EditInvoiceForm({
           </div>
         </fieldset>
 
-        {/* Invoice Status */}
+        {/* Transaction Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
-            Set the invoice status
+            Set the transaction status
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
@@ -163,7 +163,7 @@ export default function EditInvoiceForm({
                   name="status"
                   type="radio"
                   value="pending"
-                  defaultChecked={invoice.status === 'pending'}
+                  defaultChecked={transaction.status === 'pending'}
                   className="h-4 w-4 border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -179,7 +179,7 @@ export default function EditInvoiceForm({
                   name="status"
                   type="radio"
                   value="paid"
-                  defaultChecked={invoice.status === 'paid'}
+                  defaultChecked={transaction.status === 'paid'}
                   className="h-4 w-4 border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -209,12 +209,12 @@ export default function EditInvoiceForm({
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/invoices"
+          href="/dashboard/transactions"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
         </Link>
-        <Button type="submit">Edit Invoice</Button>
+        <Button type="submit">Edit Transaction</Button>
       </div>
     </form>
   );

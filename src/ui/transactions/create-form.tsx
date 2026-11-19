@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomerField, MovieField } from '@/model/definitions';
+import { UserField, MovieField } from '@/model/definitions';
 import Link from 'next/link';
 import {
   CheckIcon,
@@ -10,50 +10,50 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/ui/button';
-import { createInvoice, State } from '@/lib/actions';
+import { createTransaction, State } from '@/lib/actions';
 import { useActionState } from 'react';
 
 export default function Form({
-  customers,
+  users,
   movies,
 }: {
-  customers: CustomerField[];
+  users: UserField[];
   movies: MovieField[];
 }) {
   const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useActionState(createInvoice, initialState);
+  const [state, formAction] = useActionState(createTransaction, initialState);
 
   return (
     <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* User Name */}
         <div className="mb-4">
-          <label htmlFor="customer" className="mb-2 block text-sm font-medium">
-            Choose customer
+          <label htmlFor="user" className="mb-2 block text-sm font-medium">
+            Choose user
           </label>
           <div className="relative">
             <select
-              id="customer"
-              name="customerId"
+              id="user"
+              name="userId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               defaultValue=""
-              aria-describedby="customer-error"
+              aria-describedby="user-error"
             >
               <option value="" disabled>
-                Select a customer
+                Select a user
               </option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
                 </option>
               ))}
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
 
-          <div id="customer-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.customerId &&
-              state.errors.customerId.map((error: string) => (
+          <div id="user-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.userId &&
+              state.errors.userId.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
@@ -96,7 +96,7 @@ export default function Form({
           </div>
         </div>
 
-        {/* Invoice Type */}
+        {/* Transaction Type */}
         <fieldset className="mb-4">
           <legend className="mb-2 block text-sm font-medium">
             Set the operation type
@@ -145,10 +145,10 @@ export default function Form({
           </div>
         </fieldset>
 
-        {/* Invoice Status */}
+        {/* Transaction Status */}
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
-            Set the invoice status
+            Set the transaction status
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
@@ -202,12 +202,12 @@ export default function Form({
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/invoices"
+          href="/dashboard/transactions"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit">Create Transaction</Button>
       </div>
     </form>
   );

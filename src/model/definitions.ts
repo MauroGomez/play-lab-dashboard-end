@@ -5,7 +5,7 @@
 
 export type Role = 'admin' | 'editor' | 'viewer';
 
-export type User = {
+export type StaffUser = {
   id: string;
   name: string;
   email: string;
@@ -13,16 +13,16 @@ export type User = {
   role: Role;
 };
 
-export type Customer = {
+export type User = {
   id: string;
   name: string;
   email: string;
   image_url: string;
 };
 
-export type Invoice = {
+export type Transaction = {
   id: string;
-  customer_id: string;
+  user_id: string;
   movie_id: string;
   type: 'rental' | 'purchase';
   amount: number;
@@ -37,7 +37,7 @@ export type Revenue = {
   revenue: number;
 };
 
-export type LatestInvoice = {
+export type LatestTransaction = {
   id: string;
   name: string;
   image_url: string;
@@ -46,13 +46,13 @@ export type LatestInvoice = {
 };
 
 // The database returns a number for amount, but we later format it to a string with the formatCurrency function
-export type LatestInvoiceRaw = Omit<LatestInvoice, 'amount'> & {
+export type LatestTransactionRaw = Omit<LatestTransaction, 'amount'> & {
   amount: number;
 };
 
-export type InvoicesTable = {
+export type TransactionsTable = {
   id: string;
-  customer_id: string;
+  user_id: string;
   movie_id: string;
   name: string;
   email: string;
@@ -64,34 +64,34 @@ export type InvoicesTable = {
   status: 'pending' | 'paid';
 };
 
-export type CustomersTableType = {
+export type UsersTableType = {
   id: string;
   name: string;
   email: string;
   image_url: string;
-  total_invoices: number;
+  total_transactions: number;
   total_pending: number;
   total_paid: number;
 };
 
-export type FormattedCustomersTable = {
+export type FormattedUsersTable = {
   id: string;
   name: string;
   email: string;
   image_url: string;
-  total_invoices: number;
+  total_transactions: number;
   total_pending: string;
   total_paid: string;
 };
 
-export type CustomerField = {
+export type UserField = {
   id: string;
   name: string;
 };
 
-export type InvoiceForm = {
+export type TransactionForm = {
   id: string;
-  customer_id: string;
+  user_id: string;
   movie_id: string;
   type: 'rental' | 'purchase';
   status: 'pending' | 'paid';

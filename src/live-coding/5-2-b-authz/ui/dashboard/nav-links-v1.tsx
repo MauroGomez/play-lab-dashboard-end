@@ -12,13 +12,13 @@ import clsx from 'clsx';
 import styles from './nav-links.module.css';
 
 export default function NavLinks({
-  canReadInvoices,
+  canReadTransactions,
   canReadMovies,
-  canReadCustomers,
+  canReadUsers,
 }: {
-  canReadInvoices: boolean;
+  canReadTransactions: boolean;
   canReadMovies: boolean;
-  canReadCustomers: boolean;
+  canReadUsers: boolean;
 }) {
   const pathname = usePathname();
 
@@ -32,16 +32,16 @@ export default function NavLinks({
         <p className={styles.label}>Home</p>
       </Link>
 
-      {canReadInvoices && (
+      {canReadTransactions && (
         <Link
-          href="/dashboard/invoices"
+          href="/dashboard/transactions"
           className={clsx(
             styles.link,
-            pathname === '/dashboard/invoices' && styles.active,
+            pathname === '/dashboard/transactions' && styles.active,
           )}
         >
           <DocumentDuplicateIcon className={styles.icon} />
-          <p className={styles.label}>Invoices</p>
+          <p className={styles.label}>Purchases &amp; Rentals</p>
         </Link>
       )}
 
@@ -58,16 +58,16 @@ export default function NavLinks({
         </Link>
       )}
 
-      {canReadCustomers && (
+      {canReadUsers && (
         <Link
-          href="/dashboard/customers"
+          href="/dashboard/users"
           className={clsx(
             styles.link,
-            pathname === '/dashboard/customers' && styles.active,
+            pathname === '/dashboard/users' && styles.active,
           )}
         >
           <UserGroupIcon className={styles.icon} />
-          <p className={styles.label}>Customers</p>
+          <p className={styles.label}>Users</p>
         </Link>
       )}
     </>

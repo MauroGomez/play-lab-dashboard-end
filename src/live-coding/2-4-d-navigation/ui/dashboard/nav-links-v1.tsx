@@ -15,9 +15,9 @@ export default function NavLinks() {
         <p className={styles.label}>Home</p>
       </Link>
 
-      <Link href="/dashboard/invoices" className={styles.link}>
+      <Link href="/dashboard/transactions" className={styles.link}>
         <DocumentDuplicateIcon className={styles.icon} />
-        <p className={styles.label}>Invoices</p>
+        <p className={styles.label}>Purchases &amp; Rentals</p>
       </Link>
 
       <Link href="/dashboard/movies" className={styles.link}>
@@ -25,9 +25,9 @@ export default function NavLinks() {
         <p className={styles.label}>Movies</p>
       </Link>
 
-      <Link href="/dashboard/customers" className={styles.link}>
+      <Link href="/dashboard/users" className={styles.link}>
         <UserGroupIcon className={styles.icon} />
-        <p className={styles.label}>Customers</p>
+        <p className={styles.label}>Users</p>
       </Link>
     </>
   );

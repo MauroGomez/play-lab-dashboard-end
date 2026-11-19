@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { sql } from '@/lib/db';
 import { z } from 'zod';
-import type { Role, User } from '@/model/definitions';
+import type { Role, StaffUser } from '@/model/definitions';
 
 // Add `role` to the type of the user (and therefore of session.user)
 declare module 'next-auth' {
@@ -13,9 +13,9 @@ declare module 'next-auth' {
 }
 
 
-async function getUser(email: string): Promise<User | undefined> {
+async function getStaffUser(email: string): Promise<StaffUser | undefined> {
   try {
-    const user = await sql<User[]>`SELECT * FROM users WHERE email=${email}`;
+    const user = await sql<StaffUser[]>`SELECT * FROM staff_users WHERE email=${email}`;
     return user[0];
   } catch (error) {
     console.error('Failed to fetch user:', error);
@@ -37,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (parsedCredentials.success) {
           const { email, password } = parsedCredentials.data;
 
-          const user = await getUser(email);
+          const user = await getStaffUser(email);
           if (!user) return null;
 
           const passwordsMatch = await bcrypt.compare(password, user.password);

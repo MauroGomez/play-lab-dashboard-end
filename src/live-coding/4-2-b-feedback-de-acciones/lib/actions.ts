@@ -12,19 +12,19 @@ import * as model from '@/model/data';
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string().min(1, { message: 'Please select a customer.' }),
+  userId: z.string().min(1, { message: 'Please select a user.' }),
   movieId: z.string().min(1, { message: 'Please select a movie.' }),
   type: z.enum(['rental', 'purchase'], {
-    invalid_type_error: 'Please select an invoice type.',
+    invalid_type_error: 'Please select a transaction type.',
   }),
   status: z.enum(['pending', 'paid'], {
-    invalid_type_error: 'Please select an invoice status.',
+    invalid_type_error: 'Please select a transaction status.',
   }),
   date: z.string(),
 });
 
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const UpdateInvoice = FormSchema.omit({ date: true, id: true });
+const CreateTransaction = FormSchema.omit({ id: true, date: true });
+const UpdateTransaction = FormSchema.omit({ date: true, id: true });
 
 const MovieFormSchema = z.object({
   id: z.string(),
@@ -56,7 +56,7 @@ const UpdateMovie = MovieFormSchema.omit({ id: true });
 
 export type State = {
   errors?: {
-    customerId?: string[];
+    userId?: string[];
     movieId?: string[];
     type?: string[];
     status?: string[];
@@ -79,10 +79,10 @@ export type MovieState = {
   message?: string | null;
 };
 
-export async function createInvoice(prevState: State, formData: FormData) {
+export async function createTransaction(prevState: State, formData: FormData) {
   // Validate form fields using Zod
-  const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get('customerId'),
+  const validatedFields = CreateTransaction.safeParse({
+    userId: formData.get('userId'),
     movieId: formData.get('movieId'),
     type: formData.get('type'),
     status: formData.get('status'),
@@ -92,11 +92,11 @@ export async function createInvoice(prevState: State, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: 'Missing Fields. Failed to Create Transaction.',
     };
   }
 
-  const { customerId, movieId, type, status } = validatedFields.data;
+  const { userId, movieId, type, status } = validatedFields.data;
   const date = new Date().toISOString().split('T')[0];
 
   try {
@@ -109,33 +109,33 @@ export async function createInvoice(prevState: State, formData: FormData) {
     const movie = movies[0];
 
     if (!movie) {
-      return { message: 'Movie not found. Failed to Create Invoice.' };
+      return { message: 'Movie not found. Failed to Create Transaction.' };
     }
 
     const amount =
       type === 'purchase' ? movie.purchase_price : movie.rental_price;
 
     await sql`
-      INSERT INTO invoices (customer_id, movie_id, type, amount, status, date)
-      VALUES (${customerId}, ${movieId}, ${type}, ${amount}, ${status}, ${date})
+      INSERT INTO transactions (user_id, movie_id, type, amount, status, date)
+      VALUES (${userId}, ${movieId}, ${type}, ${amount}, ${status}, ${date})
     `;
   } catch (error) {
     return {
-      message: 'Database Error: Failed to Create Invoice.',
+      message: 'Database Error: Failed to Create Transaction.',
     };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/transactions');
+  redirect('/dashboard/transactions');
 }
 
-export async function updateInvoice(
+export async function updateTransaction(
   id: string,
   prevState: State,
   formData: FormData,
 ) {
-  const validatedFields = UpdateInvoice.safeParse({
-    customerId: formData.get('customerId'),
+  const validatedFields = UpdateTransaction.safeParse({
+    userId: formData.get('userId'),
     movieId: formData.get('movieId'),
     type: formData.get('type'),
     status: formData.get('status'),
@@ -144,11 +144,11 @@ export async function updateInvoice(
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Update Invoice.',
+      message: 'Missing Fields. Failed to Update Transaction.',
     };
   }
 
-  const { customerId, movieId, type, status } = validatedFields.data;
+  const { userId, movieId, type, status } = validatedFields.data;
 
   try {
     const movies = await sql<{ purchase_price: number; rental_price: number }[]>`
@@ -160,16 +160,16 @@ export async function updateInvoice(
     const movie = movies[0];
 
     if (!movie) {
-      return { message: 'Movie not found. Failed to Update Invoice.' };
+      return { message: 'Movie not found. Failed to Update Transaction.' };
     }
 
     const amount =
       type === 'purchase' ? movie.purchase_price : movie.rental_price;
 
     await sql`
-      UPDATE invoices
+      UPDATE transactions
       SET
-        customer_id = ${customerId},
+        user_id = ${userId},
         movie_id = ${movieId},
         type = ${type},
         amount = ${amount},
@@ -177,16 +177,16 @@ export async function updateInvoice(
       WHERE id = ${id}
     `;
   } catch (error) {
-    return { message: 'Database Error: Failed to Update Invoice.' };
+    return { message: 'Database Error: Failed to Update Transaction.' };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/transactions');
+  redirect('/dashboard/transactions');
 }
 
-export async function deleteInvoice(id: string) {
-  await sql`DELETE FROM invoices WHERE id = ${id}`;
-  revalidatePath('/dashboard/invoices');
+export async function deleteTransaction(id: string) {
+  await sql`DELETE FROM transactions WHERE id = ${id}`;
+  revalidatePath('/dashboard/transactions');
 }
 
 type CreateMovieState = {

@@ -8,9 +8,9 @@ import styles from './sidenav.module.css';
 
 export default async function SideNav() {
   // NavLinks is a client component: permissions are checked here (server) and passed as props
-  const canReadInvoices = await can('invoices:read');
+  const canReadTransactions = await can('transactions:read');
   const canReadMovies = await can('movies:read');
-  const canReadCustomers = await can('customers:read');
+  const canReadUsers = await can('users:read');
   const user = (await auth())?.user;
 
   return (
@@ -25,9 +25,9 @@ export default async function SideNav() {
       </Link>
       <div className={styles.nav}>
         <NavLinks
-          canReadInvoices={canReadInvoices}
+          canReadTransactions={canReadTransactions}
           canReadMovies={canReadMovies}
-          canReadCustomers={canReadCustomers}
+          canReadUsers={canReadUsers}
         />
         <div className={styles.spacer}></div>
         {user && (

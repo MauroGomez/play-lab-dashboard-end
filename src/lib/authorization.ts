@@ -8,11 +8,11 @@ export type Permission =
   | 'movies:read'
   | 'movies:update'
   | 'movies:delete'
-  | 'invoices:create'
-  | 'invoices:read'
-  | 'invoices:update'
-  | 'invoices:delete'
-  | 'customers:read';
+  | 'transactions:create'
+  | 'transactions:read'
+  | 'transactions:update'
+  | 'transactions:delete'
+  | 'users:read';
 
 const rolePermissions: Record<Role, readonly Permission[]> = {
   admin: [
@@ -20,14 +20,14 @@ const rolePermissions: Record<Role, readonly Permission[]> = {
     'movies:read',
     'movies:update',
     'movies:delete',
-    'invoices:create',
-    'invoices:read',
-    'invoices:update',
-    'invoices:delete',
-    'customers:read',
+    'transactions:create',
+    'transactions:read',
+    'transactions:update',
+    'transactions:delete',
+    'users:read',
   ],
-  editor: ['movies:create', 'movies:read', 'movies:update', 'customers:read'],
-  viewer: ['movies:read', 'customers:read'],
+  editor: ['movies:create', 'movies:read', 'movies:update', 'users:read'],
+  viewer: ['movies:read', 'users:read'],
 };
 
 // Role of the logged-in user, taken from the session (never from the client).

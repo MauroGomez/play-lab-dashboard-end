@@ -1,11 +1,11 @@
-import { getFilteredCustomers } from '@/model/data';
-import CustomersTable from '@/ui/customers/table';
+import { getFilteredUsers } from '@/model/data';
+import UsersTable from '@/ui/users/table';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { can } from '@/lib/authorization';
 
 export const metadata: Metadata = {
-  title: 'Customers',
+  title: 'Users',
 };
 
 export default async function Page(props: {
@@ -14,16 +14,16 @@ export default async function Page(props: {
     page?: string;
   }>;
 }) {
-  if (!(await can('customers:read'))) redirect('/dashboard');
+  if (!(await can('users:read'))) redirect('/dashboard');
 
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
 
-  const customers = await getFilteredCustomers(query);
+  const users = await getFilteredUsers(query);
 
   return (
     <main>
-      <CustomersTable customers={customers} />
+      <UsersTable users={users} />
     </main>
   );
 }

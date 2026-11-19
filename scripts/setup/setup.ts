@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import postgres from 'postgres';
-import { invoices, customers, movies, revenue, users } from './placeholder-data.ts';
+import { transactions, users, movies, revenue, staffUsers } from './placeholder-data.ts';
 import { sql, getDatabaseName, getDatabaseOptions } from '../../src/lib/db.ts';
 
 const ADMIN_DATABASE_NAME = 'neondb';
@@ -9,9 +9,9 @@ async function ensureUuidExtension(sql: postgres.TransactionSql) {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 }
 
-async function seedUsers(sql: postgres.TransactionSql) {
+async function seedStaffUsers(sql: postgres.TransactionSql) {
   await sql`
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS staff_users (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email TEXT NOT NULL UNIQUE,
@@ -20,27 +20,25 @@ async function seedUsers(sql: postgres.TransactionSql) {
     );
   `;
 
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(255) NOT NULL DEFAULT 'admin';`;
-
-  const insertedUsers = await Promise.all(
-    users.map(async (user) => {
+  const insertedStaffUsers = await Promise.all(
+    staffUsers.map(async (user) => {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       return sql`
-        INSERT INTO users (id, name, email, password, role)
+        INSERT INTO staff_users (id, name, email, password, role)
         VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword}, ${user.role})
         ON CONFLICT (id) DO NOTHING;
       `;
     }),
   );
 
-  return insertedUsers;
+  return insertedStaffUsers;
 }
 
-async function seedInvoices(sql: postgres.TransactionSql) {
+async function seedTransactions(sql: postgres.TransactionSql) {
   await sql`
-    CREATE TABLE IF NOT EXISTS invoices (
+    CREATE TABLE IF NOT EXISTS transactions (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID NOT NULL,
+      user_id UUID NOT NULL,
       movie_id UUID NOT NULL,
       type VARCHAR(255) NOT NULL,
       amount INT NOT NULL,
@@ -49,33 +47,30 @@ async function seedInvoices(sql: postgres.TransactionSql) {
     );
   `;
 
-  await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS movie_id UUID;`;
-  await sql`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS type VARCHAR(255);`;
-
-  const insertedInvoices = await Promise.all(
-    invoices.map(
-      (invoice) => sql`
-        INSERT INTO invoices (id, customer_id, movie_id, type, amount, status, date)
+  const insertedTransactions = await Promise.all(
+    transactions.map(
+      (transaction) => sql`
+        INSERT INTO transactions (id, user_id, movie_id, type, amount, status, date)
         VALUES (
-          ${invoice.id},
-          ${invoice.customer_id},
-          ${invoice.movie_id},
-          ${invoice.type},
-          ${invoice.amount},
-          ${invoice.status},
-          ${invoice.date}
+          ${transaction.id},
+          ${transaction.user_id},
+          ${transaction.movie_id},
+          ${transaction.type},
+          ${transaction.amount},
+          ${transaction.status},
+          ${transaction.date}
         )
         ON CONFLICT (id) DO NOTHING;
       `,
     ),
   );
 
-  return insertedInvoices;
+  return insertedTransactions;
 }
 
-async function seedCustomers(sql: postgres.TransactionSql) {
+async function seedUsers(sql: postgres.TransactionSql) {
   await sql`
-    CREATE TABLE IF NOT EXISTS customers (
+    CREATE TABLE IF NOT EXISTS users (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
@@ -83,17 +78,17 @@ async function seedCustomers(sql: postgres.TransactionSql) {
     );
   `;
 
-  const insertedCustomers = await Promise.all(
-    customers.map(
-      (customer) => sql`
-        INSERT INTO customers (id, name, email, image_url)
-        VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
+  const insertedUsers = await Promise.all(
+    users.map(
+      (user) => sql`
+        INSERT INTO users (id, name, email, image_url)
+        VALUES (${user.id}, ${user.name}, ${user.email}, ${user.image_url})
         ON CONFLICT (id) DO NOTHING;
       `,
     ),
   );
 
-  return insertedCustomers;
+  return insertedUsers;
 }
 
 async function seedMovies(sql: postgres.TransactionSql) {
@@ -202,10 +197,10 @@ async function setup() {
   try {
     await sql.begin(async (tx) => {
       await ensureUuidExtension(tx);
+      await seedStaffUsers(tx);
       await seedUsers(tx);
-      await seedCustomers(tx);
       await seedMovies(tx);
-      await seedInvoices(tx);
+      await seedTransactions(tx);
       await seedRevenue(tx);
     });
     console.log(`Base ${databaseName} creada y datos iniciales cargados.`);

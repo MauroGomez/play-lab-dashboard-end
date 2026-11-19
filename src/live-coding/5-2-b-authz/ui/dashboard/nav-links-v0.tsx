@@ -25,14 +25,14 @@ export default function NavLinks() {
       </Link>
 
       <Link
-        href="/dashboard/invoices"
+        href="/dashboard/transactions"
         className={clsx(
           styles.link,
-          pathname === '/dashboard/invoices' && styles.active,
+          pathname === '/dashboard/transactions' && styles.active,
         )}
       >
         <DocumentDuplicateIcon className={styles.icon} />
-        <p className={styles.label}>Invoices</p>
+        <p className={styles.label}>Purchases &amp; Rentals</p>
       </Link>
 
       <Link
@@ -47,14 +47,14 @@ export default function NavLinks() {
       </Link>
 
       <Link
-        href="/dashboard/customers"
+        href="/dashboard/users"
         className={clsx(
           styles.link,
-          pathname === '/dashboard/customers' && styles.active,
+          pathname === '/dashboard/users' && styles.active,
         )}
       >
         <UserGroupIcon className={styles.icon} />
-        <p className={styles.label}>Customers</p>
+        <p className={styles.label}>Users</p>
       </Link>
     </>
   );

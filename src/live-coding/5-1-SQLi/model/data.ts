@@ -30,7 +30,7 @@ export async function getFilteredMovies(query: string, currentPage: number) {
     // en el texto del SQL y se ejecuta con sql.unsafe(), desactivando la
     // parametrización que normalmente protege contra inyección.
     //
-    // Compará con getFilteredCustomers / la versión original de esta misma
+    // Compará con getFilteredUsers / la versión original de esta misma
     // función: allí `${`%${query}%`}` viaja como PARÁMETRO (seguro). Acá el valor
     // se interpola como TEXTO del query (inseguro).
     const columns =

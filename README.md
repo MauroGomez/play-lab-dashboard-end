@@ -36,4 +36,7 @@ por `db-admin`, sin membresía administrativa ni permisos sobre otros grupos.
 Si falla la carga, corregí el problema y repetí el comando.
 
 El script y los datos están en `scripts/setup/`. La ruta HTTP `/seed` fue eliminada.
-Los nombres de las tablas actuales se conservan.
+Las tablas son `staff_users` (acceso al dashboard), `users` (usuarios de streaming),
+`movies`, `transactions` (compras y alquileres, con `user_id`) y `revenue`.
+Las vistas usan `/dashboard/users` y `/dashboard/transactions`; el endpoint de
+creación de operaciones es `/api/transactions`. No se declaran claves foráneas.

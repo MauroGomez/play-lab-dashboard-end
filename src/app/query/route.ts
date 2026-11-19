@@ -1,12 +1,12 @@
 import { sql } from '@/lib/db';
 
 
-async function listInvoices() {
+async function listTransactions() {
   const data = await sql`
-    SELECT invoices.amount, customers.name
-    FROM invoices
-    JOIN customers ON invoices.customer_id = customers.id
-    WHERE invoices.amount = 666;
+    SELECT transactions.amount, users.name
+    FROM transactions
+    JOIN users ON transactions.user_id = users.id
+    WHERE transactions.amount = 666;
   `;
 
   return data;
@@ -18,7 +18,7 @@ export async function GET() {
   //     'Uncomment this file and remove this line. You can delete this file when you are finished.',
   // });
   try {
-    return Response.json(await listInvoices());
+    return Response.json(await listTransactions());
   } catch (error) {
     return Response.json({ error }, { status: 500 });
   }
