@@ -1,7 +1,7 @@
 import {
   UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
+  CurrencyDollarIcon,
   FilmIcon,
 } from '@heroicons/react/24/outline';
 import styles from './nav-links.module.css';
@@ -15,7 +15,7 @@ export default function NavLinks() {
       </a>
 
       <a href="/dashboard/transactions" className={styles.link}>
-        <DocumentDuplicateIcon className={styles.icon} />
+        <CurrencyDollarIcon className={styles.icon} />
         <p className={styles.label}>Purchases &amp; Rentals</p>
       </a>
 

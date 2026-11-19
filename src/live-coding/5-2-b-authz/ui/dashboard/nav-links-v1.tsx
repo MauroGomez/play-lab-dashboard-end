@@ -3,7 +3,7 @@
 import {
   UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
+  CurrencyDollarIcon,
   FilmIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -40,7 +40,7 @@ export default function NavLinks({
             pathname === '/dashboard/transactions' && styles.active,
           )}
         >
-          <DocumentDuplicateIcon className={styles.icon} />
+          <CurrencyDollarIcon className={styles.icon} />
           <p className={styles.label}>Purchases &amp; Rentals</p>
         </Link>
       )}
